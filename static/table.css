@@ -11,6 +11,15 @@
   text-align: right;
 }
 
+#customers td.qualified {
+  color:rgb(235, 52, 52);
+  font-weight: bold;
+}
+
+#customers td.standards {
+  color:rgba(173, 8, 8, 0.98);
+}
+
 #customers tr:nth-child(even){background-color: #f2f2f2;}
 
 #customers tr:hover {background-color: #ddd;}

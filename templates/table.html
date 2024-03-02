@@ -9,7 +9,7 @@
       <tr>
           <th></th>
           {% for i in range(colnames | length): %}
-          <th colspan="2">
+          <th>
             {% if i == 0 %}
                 {{ colnames[i] }}
             {% else %}
@@ -26,13 +26,14 @@
       <tr>
           <td> {{ rownames[i] }} </td>
           {% for j in range(colnames | length): %}
-            {% if j > 0 and records[i][colnames[j]] and records[i][colnames[j]] < records[i][colnames[0]] %}
-                <td> ✅ </td>
+            {% if j == 0 %}
+                <td class="standards"> {{ records[i][colnames[j]] }}  </td>
+            {% elif j > 0 and records[i][colnames[j]] 
+                and ( (records[i][colnames[j]] | length) < (records[i][colnames[0]] | length) or records[i][colnames[j]] < records[i][colnames[0]]) %}
+                <td class="qualified"> {{ records[i][colnames[j]] }} </td>
             {% else %}   
-                <td>  </td>
-            {% endif %}
-            <td>{{ records[i][colnames[j]] }} </td>
-            
+                <td> {{ records[i][colnames[j]] }}  </td>
+            {% endif %}            
           {% endfor %}
       </tr>
       {% endfor %}
