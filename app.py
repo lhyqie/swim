@@ -4,8 +4,18 @@ from utils import ScoreBoard
 
 app = Flask(__name__)
 
+
+@app.context_processor
+def utility_processor():
+    def compare_time(time1: str, time2: str) -> bool:
+        if time1 == "" or time2 == "": return False
+        timeint1 = int(time1.replace(':','').replace('.',''))
+        timeint2 = int(time2.replace(':','').replace('.',''))
+        return timeint1 < timeint2
+    return dict(compare_time=compare_time)
+
 @app.route('/')
-def hello_world():
+def show_score_board():
   # body = 'Hello World. ' + 'Today is: ' + str(date.today())
 
   sb = ScoreBoard(time_standard=(request.args.get('ts') or "JO_10_MALE"))
