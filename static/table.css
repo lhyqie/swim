@@ -32,18 +32,6 @@
   color: white;
 }
 
-a:link{
-  color:aqua;
-}
-a:visited{
-  color:aqua;
-}
-a:hover{
-  color:aqua;
-}
-a:focus{
-  color:aqua;
-}
-a:active{
+#swimmers a{
   color:aqua;
 }
