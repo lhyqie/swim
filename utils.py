@@ -97,6 +97,22 @@ def crawl_fastest_time(url):
   return events
 
 
+# for example team url:
+# https://swimstandards.com/rankings/50fr-scy-9-10-male-pc_alto?target=12&u_season=2324&u_season_start=2023&u_season_end=2024
+def crawl_swimmers(team_url):
+  response = requests.get(team_url)
+  soup = BeautifulSoup(response.content, "html.parser")
+  table = soup.select("table[id=all-results-table]")
+  subtabs = []
+  result = table[0].tbody.select("a")
+  print(len(result))
+  if len(result) > 0:
+    for a in result:
+      swimmer = a['href'].split('/')[-1]
+      # print(swimmer)
+      yield (swimmer)
+
+
 # events = crawl_all_events('https://swimstandards.com/swimmer/carlos-li')
 # for event in events:
 #   print(event)
