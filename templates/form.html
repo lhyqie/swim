@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Swimmer and Time Standards ScoreCard</title>
+<title>Swimmer and Time Standards</title>
 <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='table.css') }}">
 <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
@@ -10,12 +10,13 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.2/js/bootstrap-select.min.js"></script>
 </head>
 
-<h3>Swimmers vs Time Standards</h3>
 
+<h3 align="center">Swimmers vs Time Standards</h3>
 <div class="container">
+<br/><br/>
 <form id="multiple_select_form" action="/board" method="post">
     <b>Swimmers:</b> 
-    <br/><br/> 
+    <br/>
     <select name="swimmers" id="swimmers" class="selectpicker" data-live-search="true" multiple>
         {% for swimmer in predefined_swimmers: %}
             <option value="{{swimmer}}">{{swimmer}}</option>
@@ -23,15 +24,16 @@
     </select>
     <br/><br/>
     {{ form.more_swimmers.label }} 
-    <br/><br/>
+    <br/>
     {{ form.more_swimmers(cols="50", rows="10",placeholder="Enter comma separated swimmer ids from https://swimstandards.com/
 Example: abby-chan,stella-canoles") }}
     <br/><br/>
     <input type="hidden" name="hidden_swimmers" id="hidden_swimmers" />
-    <br/> <br/>
     {{ form.timestandard.label }}:
-    <br/><br/> {{ form.timestandard(size=8) }}
-    <input type="submit" name="submit" class="btn btn-info" value="Submit" />
+    <br>
+    {{ form.timestandard(size=8) }}
+    <br/><br/>
+    <input type="submit" name="Go" class="btn btn-info" value="Submit" />
 </form>
 </div>
 

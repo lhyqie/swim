@@ -35,3 +35,12 @@
 #swimmers a{
   color:aqua;
 }
+
+.container {
+  display: flex;
+  justify-content: center;
+}
+
+#banner {
+  font-size: 16px;
+}

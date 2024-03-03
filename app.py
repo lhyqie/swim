@@ -27,9 +27,10 @@ def board():
   sb = ScoreBoard(time_standard=timestandard)
   sb.add_time_standards()
 
-  swimmer_ids_text = request.args.get('id') or session.get('swimmers') or ""  
-  for swimmer_id in swimmer_ids_text.split(','):
-    sb.add_swimmer(swimmer_id)
+  swimmer_param = request.args.get('id') or session.get('swimmers')
+  if swimmer_param:
+    for swimmer_id in swimmer_param.split(','):
+      sb.add_swimmer(swimmer_id)
 
   # df = sb.gen_report(format='dataframe')
   # records = df.to_dict(orient='records')
@@ -56,8 +57,8 @@ def board():
 
 
 class TimestandardForm(FlaskForm):
-  more_swimmers = TextAreaField('More free-text Swimmer')
-  timestandard = SelectField('TimeStandards', choices=times_name_pair)
+  more_swimmers = TextAreaField('More Free-text Swimmers')
+  timestandard = SelectField('Time Standards', choices=times_name_pair)
   submit = SubmitField('Go')
 
 
