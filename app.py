@@ -22,12 +22,12 @@ def utility_processor():
 @app.route('/', methods=('GET', 'POST'))
 @app.route('/board', methods=('GET', 'POST'))
 def board():
-  timestandard = request.args.get('ts') or session['ts'] or 'JO_10_MALE'
+  timestandard = request.args.get('ts') or session.get('ts') or 'JO_10_MALE'
   # print('timestandard=', timestandard)
   sb = ScoreBoard(time_standard=timestandard)
   sb.add_time_standards()
 
-  swimmer_ids_text = request.args.get('id') or session['swimmers']
+  swimmer_ids_text = request.args.get('id') or session.get('swimmers') or ""  
   for swimmer_id in swimmer_ids_text.split(','):
     sb.add_swimmer(swimmer_id)
 
@@ -68,5 +68,5 @@ def form():
 
 
 if  __name__ == '__main__':
-  app.run(debug=True)
-  # app.run()
+  # app.run(debug=True)
+  app.run()
