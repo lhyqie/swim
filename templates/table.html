@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html>
 <head>
 <title>Swimmer and Time Standards ScoreCard</title>
@@ -6,6 +7,8 @@
 
 <h3>Swimmers vs Time Standards</h3>
 
+<a href="/select/">Back to Selection</a>
+<br/><br/>
 <table border="1" id="swimmers">
   <thead>
       <tr>
@@ -16,7 +19,7 @@
                 {% if colnames[i].startswith('JO')%}
                     <a href="https://www.pacswim.org/userfiles/cms/documents/809/agc-time-std.-scy-2023-2024-rev-9.18.23.pdf">{{colnames[i]}}</a>
                 {% elif colnames[i].startswith('FW') %}
-                    <a href="<a href="https://www.pacswim.org/userfiles/cms/documents/859/fw-time-std.---spring-2024-rev-8.25.23.pdf"> {{colnames[i]}} </a>
+                    <a href="https://www.pacswim.org/userfiles/cms/documents/859/fw-time-std.---spring-2024-rev-8.25.23.pdf"> {{colnames[i]}} </a>
                 {% else %}
                     {{ colnames[i] }}
                 {% endif %}

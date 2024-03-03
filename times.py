@@ -1,5 +1,14 @@
 # From https://www.pacswim.org/userfiles/cms/documents/809/agc-time-std.-scy-2023-2024-rev-9.18.23.pdf
 # and https://www.pacswim.org/userfiles/cms/documents/859/fw-time-std.---spring-2024-rev-8.25.23.pdf
+
+times_name_pair = [
+  ("JO_10_MALE",     "Age Group Championship (Junior Olympics) 10 and Under Men"), 
+  ("JO_10_FEMALE",   "Age Group Championship (Junior Olympics) 10 and Under Women"),
+  ("JO_11_MALE",     "Age Group Championship (Junior Olympics) 11 Men"), 
+  ("FW_10_MALE",     "Far Western 10 and Under Men"),
+  ("FW_11_12_MALE",  "Far Western 11-12 Men"),
+]
+
 times_map = {
   'JO_10_MALE' : {
     '25 Y Free'     : "",
