@@ -10,8 +10,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.2/js/bootstrap-select.min.js"></script>
 </head>
 
-
 <h3 align="center">Swimmers vs Time Standards</h3>
+
 <div class="container">
 <br/><br/>
 <form id="multiple_select_form" action="/board" method="post">
@@ -33,37 +33,75 @@ Example: abby-chan,stella-canoles") }}
     <br>
     {{ form.timestandard(size=8) }}
     <br/><br/>
-    <input type="submit" name="Go" class="btn btn-info" value="Submit" />
+    <input type="submit" name="Go" class="btn btn-info" value="Submit" onclick="run()" />
+    <p> </p><progress value="0" max="10000"></progress></p>
 </form>
 </div>
 
 <script>
-$(document).ready(function(){
-    $('.selectpicker').selectpicker();
-    $('#swimmers').change(function(){
-        $('#hidden_swimmers').val($('#swimmers').val());
-    });
-    $('#multiple_select_form').on('submit', function(event){
-        event.preventDefault();
-        if($('#swimmers').val() != '') {
-            var form_data = $(this).serialize();
-            $.ajax({
-                url:"/board",
-                method:"POST",
-                data:form_data,
-                success:function(data) {
-                    // console.log(data);
-                    // alert(data);
-                    $('#hidden_swimmers').val('');
-                    $('.selectpicker').selectpicker('val', '');
-                    document.location.href = '/board'
-                }
-            })
-        } else {
-            alert("Please select framework");
-            return false;
+    // For Process bar animation
+    let i, start, val;
+    const progress = document.getElementsByTagName("progress")[0];
+    progress.value = 0
+    function run() {
+        // number of swimmers from select list.
+        swimmer_count = String($("#swimmers").val()).split(',').length;
+        // console.log('swimmer_count:' + swimmer_count)
+        
+        i = 0;
+        val = 0;
+        start = performance.now();
+        requestAnimationFrame(animateProgress);
+    }
+    function animateProgress() {
+        const next = loop().next();
+        if (!next.done) {
+            progress.value = next.value;
+            frame = requestAnimationFrame(animateProgress);
         }
+        else
+            console.log(`Calculations took ${performance.now() - start}ms`);
+    }
+    function* loop() {
+        let j;
+        while (i < 10000) {
+            // more swimmer then slower to move process bar.
+            for (j = 0; j < 100 / (1 + swimmer_count * 2) ; j++) {
+                ++val;
+            }
+            ++i;
+            yield val;
+        }
+    }
+
+    // For Multi-select form on submit action.
+    $(document).ready(function () {
+        $('.selectpicker').selectpicker();
+        $('#swimmers').change(function () {
+            $('#hidden_swimmers').val($('#swimmers').val());
+        });
+        $('#multiple_select_form').on('submit', function (event) {
+
+            event.preventDefault();
+            if ($('#swimmers').val() != '') {
+                var form_data = $(this).serialize();
+                $.ajax({
+                    url: "/board",
+                    method: "POST",
+                    data: form_data,
+                    success: function (data) {
+                        // console.log(data);
+                        // alert(data);
+                        $('#hidden_swimmers').val('');
+                        $('.selectpicker').selectpicker('val', '');
+                        document.location.href = '/board'
+                    }
+                })
+            } else {
+                alert("Please select framework");
+                return false;
+            }
+        });
     });
-});
 </script>
 </html>
