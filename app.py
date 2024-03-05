@@ -19,9 +19,6 @@ def utility_processor():
         return timeint1 < timeint2
     return dict(compare_time=compare_time)
 
-@app.route('/loading/<filename>', methods=['POST'])
-def loading_model(filename):
-    return render_template ("loading.html", filename=filename)
 
 @app.route('/', methods=('GET', 'POST'))
 @app.route('/board', methods=('GET', 'POST'))
