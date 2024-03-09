@@ -22,11 +22,11 @@ class Event:
 
 class FastestEvent:
   def __init__(self):
-    self.event_name = ""
-    self.time = ""
-    self.age = ""
-    self.swim_meet = ""
-    self.date = ""
+    self.event_name = ''
+    self.time = ''
+    self.age = ''
+    self.swim_meet = ''
+    self.date = ''
 
   def __str__(self):
     # return f'{self.event_name:12s} ({self.age}) | {self.time:7s} | {self.date} | {self.swim_meet}'
@@ -36,36 +36,29 @@ class FastestEvent:
 
 def crawl_all_events(url):
   response = requests.get(url)
-  soup = BeautifulSoup(response.content, "html.parser")
-  jobj = json.loads(soup.select("script")[-1].string)
+  soup = BeautifulSoup(response.content, 'html.parser')
+  jobj = json.loads(soup.select('script')[-1].string)
   data = jobj['props']['pageProps']['swimmer']['records']['data']
-  # print(len(data))
 
   events = []
   for elem in data:
     event = Event(elem)
-    # print(event)
     events.append(event)
   return events
 
 
 def crawl_fastest_time(url):
   response = requests.get(url)
-  soup = BeautifulSoup(response.content, "html.parser")
-  # print(type(soup))
-  # print(soup.prettify())
+  soup = BeautifulSoup(response.content, 'html.parser')
 
-  tabs = soup.select("div[class=swimmer-tabs]")
+  tabs = soup.select('div[class=swimmer-tabs]')
   subtabs = []
   for tab in tabs:
-    subtabs.extend(tab.select("div[class~=active]"))
-  # print(len(subtabs))
+    subtabs.extend(tab.select('div[class~=active]'))
 
   data = []
   for tab in subtabs:
     rows = tab.table.tbody.find_all('tr') if tab.table else []
-    # print('row=',len(rows))
-
     for row in rows:
       tds = row.find_all('td')
       data_row = []
@@ -76,23 +69,22 @@ def crawl_fastest_time(url):
     break
 
   events = []
-  column_names = ["Event", "Time", "Standards", "Points", "Age", "Meet", "Meet Date"]
+  column_names = ['Event', 'Time', 'Standards', 'Points', 'Age', 'Meet', 'Meet Date']
   for row in data:
     event = FastestEvent()
     for i, cell in enumerate(row):
-      if column_names[i] in ["Event", "Time", "Age", "Meet", "Meet Date"]:
-        cell = (cell.rstrip("|").lstrip(column_names[i]+"|"))
-        if column_names[i] == "Event":
+      if column_names[i] in ['Event', 'Time', 'Age', 'Meet', 'Meet Date']:
+        cell = (cell.rstrip('|').lstrip(column_names[i]+'|'))
+        if column_names[i] == 'Event':
           event.event_name = cell
-        elif column_names[i] == "Time":
+        elif column_names[i] == 'Time':
           event.time = cell
-        elif column_names[i] == "Age":
+        elif column_names[i] == 'Age':
           event.age = cell
-        elif column_names[i] == "Meet":
+        elif column_names[i] == 'Meet':
           event.swim_meet = cell
-        elif column_names[i] == "Meet Date":
+        elif column_names[i] == 'Meet Date':
           event.date = cell
-    # print(event)
     events.append(event)
   return events
 
@@ -101,16 +93,14 @@ def crawl_fastest_time(url):
 # https://swimstandards.com/rankings/50fr-scy-9-10-male-pc_alto?target=12&u_season=2324&u_season_start=2023&u_season_end=2024
 def crawl_swimmers(team_url):
   response = requests.get(team_url)
-  soup = BeautifulSoup(response.content, "html.parser")
-  table = soup.select("table[id=all-results-table]")
+  soup = BeautifulSoup(response.content, 'html.parser')
+  table = soup.select('table[id=all-results-table]')
   subtabs = []
-  result = table[0].tbody.select("a")
-  print(len(result))
+  result = table[0].tbody.select('a')
   if len(result) > 0:
     for a in result:
       swimmer = a['href'].split('/')[-1]
-      # print(swimmer)
-      yield (swimmer)
+      yield swimmer
 
 
 # events = crawl_all_events('https://swimstandards.com/swimmer/carlos-li')
@@ -125,7 +115,6 @@ class ScoreBoard:
     self.board = []
     self.swimmers = []
     self.time_standard = time_standard
-    pass
 
   def add_time_standards(self):
     self.board.append(times_map[self.time_standard])
@@ -139,36 +128,34 @@ class ScoreBoard:
     self.board.append(column)
     self.swimmers.append(swimmer_id)
 
-  def gen_report(self, format="dataframe"):
-    if format == "dataframe":
+  def gen_report(self, format='dataframe'):
+    if format == 'dataframe':
       import numpy as np
       import pandas as pd
       df = pd.DataFrame.from_dict(self.board).T
       df.columns = self.swimmers
       return df.replace(np.nan, '')
-      pass
-    elif format == "records":
+    elif format == 'records':
       rownames = [k for k, _ in self.board[0].items()]
       colnames = self.swimmers
       records = []
       for rowname in rownames:
         time_map = {}  # for each row (event), record the fastest time per swimmer
         for i, swimmer in enumerate(self.swimmers):
-          time_map[swimmer] = self.board[i].get(rowname,"")
+          time_map[swimmer] = self.board[i].get(rowname,'')
         records.append(time_map)
       return (records, rownames, colnames)
-    elif format == "json":
+    elif format == 'json':
       from json2html import convert
       jobj = {}
       for swimmer_id, events in zip(self.swimmers, self.board):
         jobj[swimmer_id] = events
       # return json.dumps(jobj)
       return convert(json=jobj)
-      pass
-    elif format == "dict":
+    elif format == 'dict':
       jobj = {}
       for swimmer_id, events in zip(self.swimmers, self.board):
         jobj[swimmer_id] = events
       return jobj
     else:
-      return "format {format} is not supported"
+      return f'format {format} is not supported'
