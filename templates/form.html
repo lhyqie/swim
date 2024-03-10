@@ -17,7 +17,7 @@
 <form id="multiple_select_form" action="/board" method="post">
     <b>Swimmers:</b> 
     <br/>
-    <select name="swimmers" id="swimmers" class="selectpicker" data-live-search="true" multiple>
+    <select name="swimmers" id="swimmers" class="selectpicker" data-width="auto" data-live-search="true" multiple>
         {% for swimmer in predefined_swimmers: %}
             <option value="{{swimmer}}">{{swimmer}}</option>
         {% endfor %}
@@ -25,7 +25,7 @@
     <br/><br/>
     {{ form.more_swimmers.label }} 
     <br/>
-    {{ form.more_swimmers(cols="50", rows="10",placeholder="Enter comma separated swimmer ids from https://swimstandards.com/
+    {{ form.more_swimmers(cols="50", rows="6",placeholder="Enter comma separated swimmer ids from https://swimstandards.com/
 Example: abby-chan,stella-canoles") }}
     <br/><br/>
     <input type="hidden" name="hidden_swimmers" id="hidden_swimmers" />
@@ -33,7 +33,7 @@ Example: abby-chan,stella-canoles") }}
     <br>
     {{ form.timestandard(size=9) }}
     <br/><br/>
-    <input type="submit" name="Go" class="btn btn-info" value="Submit" onclick="run()"/>
+    <input type="submit" name="Go" class="btn btn-info" value="Go" onclick="run()"/>
     <p><progress value="0" max="10000"></progress></p>
 </form>
 </div>

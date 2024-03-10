@@ -42,19 +42,43 @@
   justify-content: center;
 }
 
-#banner {
-  font-size: 30px;
-}
+select.selectpicker { width: 30em }
 
-* {
-  font-size: 18px;
-}
-
-@media screen and (max-width: 500px) {
+@media (min-width:320px)  { 
+  /* smartphones, portrait iPhone, portrait 480x320 phones (Android) */ 
   #banner {
-    font-size: 100px;
+    font-size: 50px;
   }
   * {
+    font-size: 30px;
+  }
+  input.btn {
+    font-size: 30px;
+  }
+}
+
+@media (min-width:480px)  { 
+  /* smartphones, Android phones, landscape iPhone */ 
+  #banner {
     font-size: 50px;
+  }
+  * {
+    font-size: 30px;
+  }
+  input.btn {
+    font-size: 30px;
+  }
+}
+
+@media (min-width:1025px) { 
+  /* big landscape tablets, laptops, and desktops */ 
+  #banner {
+    font-size: 30px;
+  }
+  * {
+    font-size: 20px;
+  }
+  input.btn {
+    font-size: 20px;
   }
 }
