@@ -60,7 +60,7 @@ def board(format='records'):
        return response
     return redirect(url_for('board', **request.args))
   else:
-    return render_template('table.html', records=records, rownames=rownames, colnames=colnames, form=form)
+    return render_template('board.html', records=records, rownames=rownames, colnames=colnames, form=form)
 
 
 class TimestandardForm(FlaskForm):
