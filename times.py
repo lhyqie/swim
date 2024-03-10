@@ -2,18 +2,18 @@
 # and https://www.pacswim.org/userfiles/cms/documents/859/fw-time-std.---spring-2024-rev-8.25.23.pdf
 
 times_name_pair = [
-  ("JO_10_MALE",     "Age Group Championship (Junior Olympics) 10 and Under Men"), 
-  ("JO_10_FEMALE",   "Age Group Championship (Junior Olympics) 10 and Under Women"),
-  ("JO_11_MALE",     "Age Group Championship (Junior Olympics) 11 Men"), 
-  ("JO_11_FEMALE",   "Age Group Championship (Junior Olympics) 11 Women"), 
-  ("FW_10_MALE",     "Far Western 10 and Under Men"),
-  ("FW_10_FEMALE",   "Far Western 10 and Under Women"),
-  ("FW_11_12_MALE",  "Far Western 11-12 Men"),
-  ("FW_11_12_FEMALE",  "Far Western 11-12 Women"),
+  ("JO-10-MALE",     "Age Group Championship (Junior Olympics) 10 and Under Men"), 
+  ("JO-10-FEMALE",   "Age Group Championship (Junior Olympics) 10 and Under Women"),
+  ("JO-11-MALE",     "Age Group Championship (Junior Olympics) 11 Men"), 
+  ("JO-11-FEMALE",   "Age Group Championship (Junior Olympics) 11 Women"), 
+  ("FW-10-MALE",     "Far Western 10 and Under Men"),
+  ("FW-10-FEMALE",   "Far Western 10 and Under Women"),
+  ("FW-11-12-MALE",  "Far Western 11-12 Men"),
+  ("FW-11-12-FEMALE",  "Far Western 11-12 Women"),
 ]
 
 times_map = {
-  'JO_10_MALE' : {
+  'JO-10-MALE' : {
     '25 Y Free'     : "",
     '50 Y Free'     : "30.99",
     '100 Y Free'    : "1:09.69",
@@ -55,7 +55,7 @@ times_map = {
     '200 M IM'      : "3:14.29",
     '400 M IM'      : "",
   },
-  'JO_10_FEMALE' : {
+  'JO-10-FEMALE' : {
     '25 Y Free'     : "",
     '50 Y Free'     : "31.39",
     '100 Y Free'    : "1:10.49",
@@ -97,7 +97,7 @@ times_map = {
     '200 M IM'      : "3:17.09",
     '400 M IM'      : "",
   },
-  'JO_11_MALE' : {
+  'JO-11-MALE' : {
     '25 Y Free'     : "",
     '50 Y Free'     : "29.79",
     '100 Y Free'    : "1:05.19",
@@ -139,7 +139,7 @@ times_map = {
     '200 M IM'      : "3:05.49",
     '400 M IM'      : "6:33.39",
   },
-  'JO_11_FEMALE' : {
+  'JO-11-FEMALE' : {
     '25 Y Free'     : "",
     '50 Y Free'     : "30.09",
     '100 Y Free'    : "1:05.49",
@@ -181,7 +181,7 @@ times_map = {
     '200 M IM'      : "3:04.39",
     '400 M IM'      : "6:34.19",
   },
-  'FW_10_MALE' : {
+  'FW-10-MALE' : {
     '25 Y Free'     : "",
     '50 Y Free'     : "30.19",
     '100 Y Free'    : "1:07.59",
@@ -223,7 +223,7 @@ times_map = {
     '200 M IM'      : "3:09.69",
     '400 M IM'      : "",
   },
-  'FW_10_FEMALE' : {
+  'FW-10-FEMALE' : {
     '25 Y Free'     : "",
     '50 Y Free'     : "30.19",
     '100 Y Free'    : "1:08.09",
@@ -265,7 +265,7 @@ times_map = {
     '200 M IM'      : "3:09.69",
     '400 M IM'      : "",
   },
-  'FW_11_12_MALE' : {
+  'FW-11-12-MALE' : {
     '25 Y Free'     : "",
     '50 Y Free'     : "26.19",
     '100 Y Free'    : "57.29",
@@ -307,7 +307,7 @@ times_map = {
     '200 M IM'      : "2:46.19",
     '400 M IM'      : "5:43.19",
   },
-  'FW_11_12_FEMALE' : {
+  'FW-11-12-FEMALE' : {
     '25 Y Free'     : "",
     '50 Y Free'     : "26.79",
     '100 Y Free'    : "59.09",

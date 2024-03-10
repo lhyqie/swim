@@ -24,7 +24,7 @@ def utility_processor():
 @app.route('/', methods=('GET', 'POST'))
 @app.route('/board', methods=('GET', 'POST'))
 def board(format='records'):
-  timestandard = request.args.get('ts') or session.get('ts') or 'JO_10_MALE'
+  timestandard = request.args.get('ts') or session.get('ts') or 'JO-10-MALE'
   logging.debug(f'request.method={request.method}')
   logging.debug(f'timestandard={timestandard}')
 
@@ -46,7 +46,7 @@ def board(format='records'):
   logging.debug(f'records size={len(records)}, rownames size={len(rownames)}, colnames size={len(colnames)}')
 
   if request.method == 'POST':
-    session['ts'] = request.form.get('timestandard','JO_10_MALE')
+    session['ts'] = request.form.get('timestandard','JO-10-MALE')
     session['swimmers'] = request.form['hidden_swimmers']
     if len(request.form['more_swimmers']) and len(request.form['more_swimmers'].split(',')) >= 1:
        session['swimmers'] += (',' if session['swimmers'] else '') + request.form['more_swimmers']

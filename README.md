@@ -1,9 +1,9 @@
 Two methods to query:
 
 
-1. /board?id=swimmer1,swimmer2&ts=JO_10_MALE
+1. /board?id=swimmer1,swimmer2&ts=JO-10-MALE
 where swimmer1,swimmer2 are IDs from https://swimstandards.com/
-and JO_10_MALE is defined from times.py
+and JO-10-MALE is defined from times.py
 
 example: /board?id=carlos-li,ian-sun&ts=FW_11_12_MALE
 
