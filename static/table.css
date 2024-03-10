@@ -43,5 +43,13 @@
 }
 
 #banner {
-  font-size: 16px;
+  font-size: 3vw;
+}
+
+#goback {
+  font-size: 2vw;
+}
+
+* {
+  font-size: 2vw;
 }
