@@ -46,7 +46,7 @@ def board(format='records'):
   logging.debug(f'records size={len(records)}, rownames size={len(rownames)}, colnames size={len(colnames)}')
 
   if request.method == 'POST':
-    session['ts'] = request.form['timestandard']
+    session['ts'] = request.form.get('timestandard','JO_10_MALE')
     session['swimmers'] = request.form['hidden_swimmers']
     if len(request.form['more_swimmers']) and len(request.form['more_swimmers'].split(',')) >= 1:
        session['swimmers'] += (',' if session['swimmers'] else '') + request.form['more_swimmers']
