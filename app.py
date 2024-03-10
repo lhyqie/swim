@@ -21,12 +21,6 @@ def utility_processor():
     return dict(compare_time=compare_time)
 
 
-@app.before_first_request
-def clear_session():
-    logging.debug('Clear session.')
-    session.clear()
-
-
 @app.route('/', methods=('GET', 'POST'))
 @app.route('/board', methods=('GET', 'POST'))
 def board(format='records'):
