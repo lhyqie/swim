@@ -37,6 +37,10 @@
   color:aqua;
 }
 
+select #swimmers {
+  width: 150px;
+}
+
 .container {
   display: flex;
   justify-content: center;
