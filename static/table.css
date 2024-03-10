@@ -37,23 +37,24 @@
   color:aqua;
 }
 
-select #swimmers {
-  width: 150px;
-}
-
 .container {
   display: flex;
   justify-content: center;
 }
 
 #banner {
-  font-size: 3vw;
-}
-
-#goback {
-  font-size: 2vw;
+  font-size: 30px;
 }
 
 * {
-  font-size: 2vw;
+  font-size: 18px;
+}
+
+@media screen and (max-width: 500px) {
+  #banner {
+    font-size: 100px;
+  }
+  * {
+    font-size: 50px;
+  }
 }

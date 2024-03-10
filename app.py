@@ -1,3 +1,4 @@
+from datetime import timedelta
 from flask import Flask, render_template, request, session, redirect, url_for, after_this_request
 from flask_wtf import FlaskForm
 from utils import ScoreBoard
@@ -10,6 +11,7 @@ import os
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY') or 'you-will-never-guess'
+app.config['PERMANENT_SESSION_LIFETIME'] =  timedelta(minutes=5)
 
 @app.context_processor
 def utility_processor():
