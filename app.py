@@ -7,6 +7,7 @@ from swimmers import predefined_swimmers
 from times import times_name_pair
 
 import logging
+import sqlite3
 import os
 
 app = Flask(__name__)
@@ -75,6 +76,15 @@ class TimestandardForm(FlaskForm):
 def form():
   form = TimestandardForm()
   return render_template('form.html', predefined_swimmers=predefined_swimmers, form=form)
+  
+
+@app.route('/testdb/')
+def testdb():
+  conn = sqlite3.connect('swimmers_test.db')
+  conn.row_factory = sqlite3.Row
+  swimmers = conn.execute('SELECT * FROM swimmers').fetchall()
+  conn.close()
+  return render_template('testdb.html', swimmers=swimmers)
 
 
 if  __name__ == '__main__':

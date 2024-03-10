@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+    <hr>
+    <div class="content">
+      {% block content %}
+      {% for swimmer in swimmers %}
+          <div>
+            <p>{{ swimmer['id'] }} : {{ swimmer['fastest_time'] }} </p>
+          </div>
+      {% endfor %}
+      {% endblock %}
+    </div>
+</body>
+</html>

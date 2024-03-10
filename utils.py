@@ -1,5 +1,6 @@
 import json
 import requests
+import sqlite3
 from bs4 import BeautifulSoup
 from times import times_map
 
@@ -34,87 +35,115 @@ class FastestEvent:
     return f'{self.event_name:12s} | {self.time:7s}'
 
 
-def crawl_all_events(url):
-  response = requests.get(url)
-  soup = BeautifulSoup(response.content, 'html.parser')
-  jobj = json.loads(soup.select('script')[-1].string)
-  data = jobj['props']['pageProps']['swimmer']['records']['data']
+class SwimStandardsCrawler:
+  def __init__(self):
+    pass
 
-  events = []
-  for elem in data:
-    event = Event(elem)
-    events.append(event)
-  return events
+  # for example swimmer url: https://swimstandards.com/swimmer/abby-chan
+  def crawl_all_events(self, url):
+    response = requests.get(url)
+    soup = BeautifulSoup(response.content, 'html.parser')
+    jobj = json.loads(soup.select('script')[-1].string)
+    data = jobj['props']['pageProps']['swimmer']['records']['data']
 
+    events = []
+    for elem in data:
+      event = Event(elem)
+      events.append(event)
+    return events
 
-def crawl_fastest_time(url):
-  response = requests.get(url)
-  soup = BeautifulSoup(response.content, 'html.parser')
+  # for example swimmer url: https://swimstandards.com/swimmer/abby-chan
+  def crawl_fastest_time(self, url):
+    response = requests.get(url)
+    soup = BeautifulSoup(response.content, 'html.parser')
 
-  tabs = soup.select('div[class=swimmer-tabs]')
-  subtabs = []
-  for tab in tabs:
-    subtabs.extend(tab.select('div[class~=active]'))
+    tabs = soup.select('div[class=swimmer-tabs]')
+    subtabs = []
+    for tab in tabs:
+      subtabs.extend(tab.select('div[class~=active]'))
 
-  data = []
-  for tab in subtabs:
-    rows = tab.table.tbody.find_all('tr') if tab.table else []
-    for row in rows:
-      tds = row.find_all('td')
-      data_row = []
-      for ele in tds:
-        cell = ele.get_text('|').strip()
-        data_row.append(cell)
-      data.append(data_row)
-    break
+    data = []
+    for tab in subtabs:
+      rows = tab.table.tbody.find_all('tr') if tab.table else []
+      for row in rows:
+        tds = row.find_all('td')
+        data_row = []
+        for ele in tds:
+          cell = ele.get_text('|').strip()
+          data_row.append(cell)
+        data.append(data_row)
+      break
 
-  events = []
-  column_names = ['Event', 'Time', 'Standards', 'Points', 'Age', 'Meet', 'Meet Date']
-  for row in data:
-    event = FastestEvent()
-    for i, cell in enumerate(row):
-      if column_names[i] in ['Event', 'Time', 'Age', 'Meet', 'Meet Date']:
-        cell = (cell.rstrip('|').lstrip(column_names[i]+'|'))
-        if column_names[i] == 'Event':
-          event.event_name = cell
-        elif column_names[i] == 'Time':
-          event.time = cell
-        elif column_names[i] == 'Age':
-          event.age = cell
-        elif column_names[i] == 'Meet':
-          event.swim_meet = cell
-        elif column_names[i] == 'Meet Date':
-          event.date = cell
-    events.append(event)
-  return events
+    events = []
+    column_names = ['Event', 'Time', 'Standards', 'Points', 'Age', 'Meet', 'Meet Date']
+    for row in data:
+      event = FastestEvent()
+      for i, cell in enumerate(row):
+        if column_names[i] in ['Event', 'Time', 'Age', 'Meet', 'Meet Date']:
+          cell = (cell.rstrip('|').lstrip(column_names[i]+'|'))
+          if column_names[i] == 'Event':
+            event.event_name = cell
+          elif column_names[i] == 'Time':
+            event.time = cell
+          elif column_names[i] == 'Age':
+            event.age = cell
+          elif column_names[i] == 'Meet':
+            event.swim_meet = cell
+          elif column_names[i] == 'Meet Date':
+            event.date = cell
+      events.append(event)
+    return events
 
+  # for example team url:
+  # https://swimstandards.com/rankings/50fr-scy-9-10-male-pc_alto?target=12&u_season=2324&u_season_start=2023&u_season_end=2024
+  def crawl_swimmers(self, team_url):
+    response = requests.get(team_url)
+    soup = BeautifulSoup(response.content, 'html.parser')
+    table = soup.select('table[id=all-results-table]')
+    subtabs = []
+    result = table[0].tbody.select('a')
+    if len(result) > 0:
+      for a in result:
+        swimmer = a['href'].split('/')[-1]
+        yield swimmer
 
-# for example team url:
-# https://swimstandards.com/rankings/50fr-scy-9-10-male-pc_alto?target=12&u_season=2324&u_season_start=2023&u_season_end=2024
-def crawl_swimmers(team_url):
-  response = requests.get(team_url)
-  soup = BeautifulSoup(response.content, 'html.parser')
-  table = soup.select('table[id=all-results-table]')
-  subtabs = []
-  result = table[0].tbody.select('a')
-  if len(result) > 0:
-    for a in result:
-      swimmer = a['href'].split('/')[-1]
-      yield swimmer
+class EventStore:
+  def __init__(self, sqldb_file):
+    self.crawler = SwimStandardsCrawler()
+    self.sqldb_file = sqldb_file
 
+  def swimmer_fastest_time(self, swimmer_id, use_cache=True):
+    from_db = self.swimmer_fastest_time_from_db(swimmer_id)
+    if use_cache and len(from_db) > 0:
+      events = []
+      for elem in from_db[0]['fastest_time'].strip().split(','):
+        event = FastestEvent()
+        tokens = elem.split(':')
+        event.event_name = tokens[0].strip()
+        event.time = tokens[1].strip()
+        events.append(event)
+      return events
+    else:
+      return self.crawler.crawl_fastest_time('https://swimstandards.com/swimmer/' + swimmer_id)
 
-# events = crawl_all_events('https://swimstandards.com/swimmer/carlos-li')
-# for event in events:
-#   print(event)
-# events = crawl_fastest_time('https://swimstandards.com/swimmer/carlos-li')
-# for event in events:
-#   print(event)
+  def swimmer_fastest_time_from_db(self, swimmer_id):
+    conn = self._get_db_connection()
+    swimmers = conn.execute(f'SELECT * FROM swimmers WHERE id="{swimmer_id}"').fetchall()
+    conn.close()
+    return swimmers
+
+  def _get_db_connection(self):
+    conn = sqlite3.connect(self.sqldb_file)
+    conn.row_factory = sqlite3.Row
+    return conn
 
 class ScoreBoard:
   def __init__(self, time_standard) -> None:
     self.board = []
     self.swimmers = []
     self.time_standard = time_standard
+    # TODO: replace with a real swimmer db.
+    self.event_store = EventStore('swimmers_test.db')
 
   def add_time_standards(self):
     self.board.append(times_map[self.time_standard])
@@ -122,7 +151,7 @@ class ScoreBoard:
 
   def add_swimmer(self, swimmer_id):
     column = {}
-    events = crawl_fastest_time('https://swimstandards.com/swimmer/' + swimmer_id)
+    events = self.event_store.swimmer_fastest_time(swimmer_id, use_cache=True)
     for event in events:
       column[event.event_name] = event.time
     self.board.append(column)
