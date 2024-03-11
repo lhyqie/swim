@@ -2,7 +2,11 @@ import json
 import requests
 import sqlite3
 from bs4 import BeautifulSoup
+from datetime import datetime
+from datetime import timedelta
+from flask import session
 from times import times_map
+
 
 class Event:
   def __init__(self, entry):
@@ -111,26 +115,42 @@ class EventStore:
   def __init__(self, sqldb_file):
     self.crawler = SwimStandardsCrawler()
     self.sqldb_file = sqldb_file
+    self.db_cache_expiry = timedelta(days=3)
 
   def swimmer_fastest_time(self, swimmer_id, use_cache=True):
     from_db = self.swimmer_fastest_time_from_db(swimmer_id)
-    if use_cache and len(from_db) > 0:
-      events = []
-      for elem in from_db[0]['fastest_time'].strip().split(','):
-        event = FastestEvent()
-        tokens = elem.split(':')
-        event.event_name = tokens[0].strip()
-        event.time = tokens[1].strip()
-        events.append(event)
-      return events
-    else:
-      return self.crawler.crawl_fastest_time('https://swimstandards.com/swimmer/' + swimmer_id)
+    
+    if use_cache and len(from_db) > 0: 
+      cache_datetime = datetime.strptime(from_db[0]['crawl_date'], '%Y-%m-%d %H:%M:%S')
+      if (datetime.now() - cache_datetime) < self.db_cache_expiry:
+        events = []
+        for elem in from_db[0]['fastest_time'].strip().split(','):
+          event = FastestEvent()
+          tokens = elem.split(':')
+          event.event_name = tokens[0].strip()
+          event.time = tokens[1].strip()
+          events.append(event)
+        return events
+    events = self.crawler.crawl_fastest_time('https://swimstandards.com/swimmer/' + swimmer_id)
+    # use live fetched stats to database.
+    self.swimmer_fastest_time_to_db(swimmer_id, events)
+    return events
 
   def swimmer_fastest_time_from_db(self, swimmer_id):
     conn = self._get_db_connection()
     swimmers = conn.execute(f'SELECT * FROM swimmers WHERE id="{swimmer_id}"').fetchall()
     conn.close()
     return swimmers
+  
+  def swimmer_fastest_time_to_db(self, swimmer_id, events):
+    event_str = ','.join([f'{event.event_name}:{event.time}' for event in events])
+    if not event_str: return
+    conn = self._get_db_connection()
+    cur = conn.cursor()
+    cur.execute(f"DELETE FROM swimmers WHERE id='{swimmer_id}'")
+    cur.execute(f"INSERT INTO swimmers (id, fastest_time) VALUES ('{swimmer_id}', '{event_str}')")
+    conn.commit()
+    conn.close()
 
   def _get_db_connection(self):
     conn = sqlite3.connect(self.sqldb_file)
@@ -143,7 +163,7 @@ class ScoreBoard:
     self.swimmers = []
     self.time_standard = time_standard
     # TODO: replace with a real swimmer db.
-    self.event_store = EventStore('swimmers_test.db')
+    self.event_store = EventStore('swimmers.db')
 
   def add_time_standards(self):
     self.board.append(times_map[self.time_standard])

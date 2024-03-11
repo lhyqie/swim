@@ -1,17 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+<meta charset="UTF-8">
+<style>
+table, th, td {
+  border: 1px solid black;
+  border-collapse: collapse;
+  padding: 10px;
+}
+</style>
+
 </head>
 <body>
     <hr>
     <div class="content">
       {% block content %}
+      <table>
       {% for swimmer in swimmers %}
-          <div>
-            <p>{{ swimmer['id'] }} : {{ swimmer['fastest_time'] }} </p>
-          </div>
+        <tr>
+          <td>{{ swimmer['id'] }} </td> <td>{{ swimmer['crawl_date'] }} </td> <td>{{ swimmer['fastest_time'] }} </td>
+        </tr>
       {% endfor %}
+      </table>
       {% endblock %}
     </div>
 </body>

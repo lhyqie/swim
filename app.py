@@ -56,13 +56,13 @@ def board(format='records'):
     logging.debug(f'request.arg: {request.args}')
     logging.debug(f"session[ts]:{session['ts']}")
     logging.debug(f"session[swimmers]:{session['swimmers']}")
-
+    return redirect(url_for('board', **request.args))
+  else:
     @after_this_request
     def do_sth_after(response):
        logging.debug('Finished. response:{response}')
        return response
-    return redirect(url_for('board', **request.args))
-  else:
+
     return render_template('board.html', records=records, rownames=rownames, colnames=colnames, form=form)
 
 
@@ -80,7 +80,7 @@ def form():
 
 @app.route('/testdb/')
 def testdb():
-  conn = sqlite3.connect('swimmers_test.db')
+  conn = sqlite3.connect('swimmers.db')
   conn.row_factory = sqlite3.Row
   swimmers = conn.execute('SELECT * FROM swimmers').fetchall()
   conn.close()

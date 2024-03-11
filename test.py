@@ -22,17 +22,22 @@ crawler = SwimStandardsCrawler()
 #   print(f"'{swimmer}',")
 
 # -------------------- Test EventStore --------------------------
-from utils import EventStore
-event_store = EventStore(sqldb_file='swimmers_test.db')
-for row in event_store.swimmer_fastest_time_from_db('abby-chan'):
-  print(row['id'], row['fastest_time'])
-print(event_store.swimmer_fastest_time_from_db('unknown-swimmer'))
-print()
-for event in event_store.swimmer_fastest_time('abby-chan', use_cache=True):
-  print(event)
-print()
-for event in event_store.swimmer_fastest_time('abby-chan', use_cache=False):
-  print(event)
+# from utils import EventStore
+# event_store = EventStore(sqldb_file='swimmers_test.db')
+# for row in event_store.swimmer_fastest_time_from_db('abby-chan'):
+#   print(row['id'], row['fastest_time'])
+# print(event_store.swimmer_fastest_time_from_db('unknown-swimmer'))
+# print()
+# for event in event_store.swimmer_fastest_time('abby-chan', use_cache=True):
+#   print(event)
+# print()
+# for event in event_store.swimmer_fastest_time('abby-chan', use_cache=False):
+#   print(event)
+# // Test update swimmer fastest times to db.
+# events = event_store.swimmer_fastest_time('abby-chan', use_cache=False)
+# for event in events:
+#   print(event)
+# event_store.swimmer_fastest_time_to_db('abby-chan', events)
 
 # -------------------- Test ScoreBoard --------------------------
 # from utils import ScoreBoard
@@ -79,3 +84,13 @@ for event in event_store.swimmer_fastest_time('abby-chan', use_cache=False):
 
 # import sqlite3
 # print(sqlite3.version)
+
+# from datetime import datetime
+# date = datetime.strptime('2024-03-10 08:20:20','%Y-%m-%d %H:%M:%S')
+# print(date)
+
+# from datetime import datetime
+# date2 = datetime.now()
+
+# print(type(date2 - date))
+# print((date2 - date))
