@@ -116,6 +116,8 @@ class EventStore:
     self.crawler = SwimStandardsCrawler()
     self.sqldb_file = sqldb_file
     self.db_cache_expiry = timedelta(days=3)
+    self.event_delim = '|'
+    self.event_time_delim = '-'
 
   def swimmer_fastest_time(self, swimmer_id, use_cache=True):
     from_db = self.swimmer_fastest_time_from_db(swimmer_id)
@@ -124,9 +126,9 @@ class EventStore:
       cache_datetime = datetime.strptime(from_db[0]['crawl_date'], '%Y-%m-%d %H:%M:%S')
       if (datetime.now() - cache_datetime) < self.db_cache_expiry:
         events = []
-        for elem in from_db[0]['fastest_time'].strip().split(','):
+        for elem in from_db[0]['fastest_time'].strip().split(self.event_delim):
           event = FastestEvent()
-          tokens = elem.split(':')
+          tokens = elem.split(self.event_time_delim)
           event.event_name = tokens[0].strip()
           event.time = tokens[1].strip()
           events.append(event)
@@ -143,7 +145,7 @@ class EventStore:
     return swimmers
   
   def swimmer_fastest_time_to_db(self, swimmer_id, events):
-    event_str = ','.join([f'{event.event_name}:{event.time}' for event in events])
+    event_str = self.event_delim.join([f'{event.event_name}{self.event_time_delim}{event.time}' for event in events])
     if not event_str: return
     conn = self._get_db_connection()
     cur = conn.cursor()
