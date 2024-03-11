@@ -8,7 +8,7 @@
 <body>
 <h3 id="banner">Swimmers vs Time Standards</h3>
 <input type="button" value="Share" onclick="copy_url()"></input>
-&nbsp;&nbsp;&nbsp;&nbsp;<a id="url_text" href=""></a><span id="is_copied" href=""></span>
+&nbsp;&nbsp;&nbsp;&nbsp;<a id="url_text" href=""></a>
 <br/><br/>
 <input type="text" id="event_filter" onkeyup="apply_filter()" placeholder="Search for Event Name.." size="30">
 &nbsp;&nbsp;&nbsp;&nbsp;
@@ -99,7 +99,6 @@ function copy_url() {
     }
     // console.log(url);
     document.getElementById("url_text").innerHTML = url;
-    document.getElementById("is_copied").innerHTML = " is copied to clipboard";
     document.getElementById("url_text").href = url;
     // Copy the text inside the text field
     navigator.clipboard.writeText(url).then(() => {
