@@ -16,6 +16,7 @@ table, th, td {
     <div class="content">
       {% block content %}
       <table>
+      <tr><th>swimmer_id</th><th>crawl/cache time</th><th>Fastest time for Events</th></tr>
       {% for swimmer in swimmers %}
         <tr>
           <td>{{ swimmer['id'] }} </td> <td>{{ swimmer['crawl_date'] }} </td> <td>{{ swimmer['fastest_time'] }} </td>

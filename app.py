@@ -78,6 +78,10 @@ def form():
   return render_template('form.html', predefined_swimmers=predefined_swimmers, form=form)
   
 
+@app.route('/cache/')
+@app.route('/cachedb/')
+@app.route('/dbcache/')
+@app.route('/db/')
 @app.route('/testdb/')
 def testdb():
   conn = sqlite3.connect('swimmers.db')
