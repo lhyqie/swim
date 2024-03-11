@@ -7,10 +7,14 @@
 
 <body>
 <h3 id="banner">Swimmers vs Time Standards</h3>
-
+<input type="button" value="Share" onclick="copy_url()"></input>
+&nbsp;&nbsp;&nbsp;&nbsp;<a id="url_text" href=""></a><span id="is_copied" href=""></span>
+<br/><br/>
 <input type="text" id="event_filter" onkeyup="apply_filter()" placeholder="Search for Event Name.." size="30">
 &nbsp;&nbsp;&nbsp;&nbsp;
 <a href="/select" id="goback">Back to Selection</a>
+&nbsp;&nbsp;&nbsp;&nbsp;
+
 <br/><br/>
 <table border="1" id="swimmers">
   <thead>
@@ -71,6 +75,34 @@ function apply_filter() {
         }
     }       
     }
+}
+function copy_url() {
+    var input, filter, table, tr, td, i, txtValue;
+    table = document.getElementById("swimmers");
+    tr = table.getElementsByTagName("tr");    
+    th_list = tr[0].getElementsByTagName("th");
+    console.log(th_list.length);
+    if (th_list.length <= 1) {
+        return;
+    } 
+    var url = "http://qualihub.net/board?"
+    url += "ts="+th_list[1].innerText;
+    if (th_list.length > 2) {
+        url += "&id=";
+    }
+    for (i = 2; i < th_list.length; i++) {
+      url += (th_list[i].innerText);
+      if ( i < th_list.length - 1) {
+        url += ",";
+      }
+      
+    }
+    // console.log(url);
+    document.getElementById("url_text").innerHTML = url;
+    document.getElementById("is_copied").innerHTML = " is copied to clipboard";
+    document.getElementById("url_text").href = url;
+    // Copy the text inside the text field
+    navigator.clipboard.writeText(url);
 }
 </script>
 
