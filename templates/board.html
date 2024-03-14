@@ -157,13 +157,22 @@ function copy_url() {
     if (th_list.length > 2) {
         url += "&id=";
     }
-    for (i = 2; i < th_list.length; i++) {
+    const buttonChecked = document.querySelector('#headroom').checked;
+    for (i = 2; i < th_list.length; ) {
       url += (th_list[i].innerText);
-      if ( i < th_list.length - 1) {
-        url += ",";
+      if (buttonChecked) {
+        if ( i < th_list.length - 2) {
+          url += ",";
+        }
+        i += 2;
+      } else {
+        if ( i < th_list.length - 1) {
+          url += ",";
+        }
+        i += 1;
       }
-      
     }
+
     // console.log(url);
     document.getElementById("url_text").innerHTML = url;
     document.getElementById("url_text").href = url;
