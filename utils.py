@@ -89,8 +89,6 @@ class SwimStandardsCrawler:
             event.event_name = cell
           elif column_names[i] == 'Time':
             event.time = cell
-          elif column_names[i] == 'Standard':
-            event.standard = cell
           elif column_names[i] == 'Age':
             event.age = cell
           elif column_names[i] == 'Meet':
@@ -175,7 +173,7 @@ class ScoreBoard:
 
   def add_swimmer(self, swimmer_id):
     column = {}
-    events = self.event_store.swimmer_fastest_time(swimmer_id, use_cache=False)
+    events = self.event_store.swimmer_fastest_time(swimmer_id, use_cache=True)
     for event in events:
       column[event.event_name] = event.time
     self.board.append(column)
