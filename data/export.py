@@ -20,4 +20,6 @@ def load_national_times(tsv_file):
 national_timemap = {}
 national_timemap['10-MALE'] = load_national_times('data/national_times_10_boys.tsv')
 national_timemap['10-FEMALE'] = load_national_times('data/national_times_10_girls.tsv')
+national_timemap['11-12-MALE'] = load_national_times('data/national_times_11_12_boys.tsv')
+national_timemap['11-12-FEMALE'] = load_national_times('data/national_times_11_12_girls.tsv')
 print(national_timemap)  # copy the output to times.py and format
