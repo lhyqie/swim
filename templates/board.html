@@ -97,7 +97,9 @@ input:checked + .slider:before {
                 {% endif %}
             </th>
             {% elif colnames[i].endswith('@nt') %} 
-            <th id="{{nationaltime}}"> 📶 </th>
+            <th id="{{nationaltime}}" style="text-align:center;"> 
+                <a href="https://www.pacswim.org/userfiles/cms/documents/801/2021-2024-national-age-group-motivational-times.pdf"> {{nationaltime}} 
+                </a> </th>
             {% else %}
             <th>
                 <a href="https://swimstandards.com/swimmer/{{colnames[i]}}">
@@ -113,11 +115,11 @@ input:checked + .slider:before {
           <td> {{ rownames[i] }} </td>
           {% for j in range(colnames | length): %}
             {% if j == 0 %}
-                <td class="standards"> {{ records[i][colnames[j]] }}  </td>
+                <td style="font-family: monospace;" class="standards"> {{ records[i][colnames[j]] }}  </td>
             {% elif j > 0 and compare_time(records[i][colnames[j]], records[i][colnames[0]]) %}
-                <td class="qualified"> {{ records[i][colnames[j]] }} </td>
+                <td style="font-family: monospace;" class="qualified"> {{ records[i][colnames[j]] }} </td>
             {% else %}   
-                <td> {{ records[i][colnames[j]] }}  </td>
+                <td style="font-family: monospace;"> {{ records[i][colnames[j]] }}  </td>
             {% endif %}            
           {% endfor %}
       </tr>
@@ -214,6 +216,7 @@ function toggle_headroom_column() {
                 const cell = document.createElement(i ? "td" : "th")
                 cell.appendChild(span)
                 cell.style.textAlign="center";
+                cell.style.fontFamily="monospace";
                 cell.classList.add("time-delta")
                 row.insertBefore(cell, row.children[j+1]);
             }
