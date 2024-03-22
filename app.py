@@ -4,7 +4,7 @@ from flask_wtf import FlaskForm
 from utils import ScoreBoard
 from wtforms import SelectField, SubmitField, TextAreaField
 from swimmers import predefined_swimmers
-from times import times_name_pair
+from times import times_name_pair, national_times_name_pair
 
 import logging
 import sqlite3
@@ -17,27 +17,32 @@ app.config['PERMANENT_SESSION_LIFETIME'] =  timedelta(minutes=5)
 @app.context_processor
 def utility_processor():
     def compare_time(time1: str, time2: str) -> bool:
-        if time1 == '' or time2 == '': return False
+      if time1 == '' or time2 == '': return False
+      try:
         timeint1 = int(time1.replace(':','').replace('.',''))
         timeint2 = int(time2.replace(':','').replace('.',''))
-        return timeint1 < timeint2
+      except ValueError:
+        return False
+      return timeint1 < timeint2
     return dict(compare_time=compare_time)
 
 
 @app.route('/', methods=('GET', 'POST'))
 @app.route('/board', methods=('GET', 'POST'))
-def board(format='records'):
+def board(format='records+nationaltime'):
   timestandard = request.args.get('ts') or session.get('ts') or 'JO-10-MALE'
+  nationaltime = request.args.get('nt') or session.get('nt') or '10-MALE'
   logging.debug(f'request.method={request.method}')
   logging.debug(f'timestandard={timestandard}')
+  logging.debug(f'nationaltime={nationaltime}')
 
-  sb = ScoreBoard(time_standard=timestandard)
+  sb = ScoreBoard(time_standard=timestandard, national_time=nationaltime)
   sb.add_time_standards()
   swimmer_param = request.args.get('id') or session.get('swimmers')
   if swimmer_param:
     for swimmer_id in swimmer_param.split(','):
       sb.add_swimmer(swimmer_id)
-  if format == 'records':
+  if format in ('records', 'records+nationaltime'):
     records, rownames, colnames = sb.gen_report(format=format)
   elif format == 'dataframe':
     df = sb.gen_report(format=format)
@@ -50,6 +55,7 @@ def board(format='records'):
 
   if request.method == 'POST':
     session['ts'] = request.form.get('timestandard','JO-10-MALE')
+    session['nt'] = request.form.get('nationaltime','10-MALE')
     session['swimmers'] = request.form['hidden_swimmers']
     if len(request.form['more_swimmers']) and len(request.form['more_swimmers'].split(',')) >= 1:
        session['swimmers'] += (',' if session['swimmers'] else '') + request.form['more_swimmers']
@@ -63,12 +69,13 @@ def board(format='records'):
        logging.debug('Finished. response:{response}')
        return response
 
-    return render_template('board.html', records=records, rownames=rownames, colnames=colnames, form=form)
+    return render_template('board.html', format=format, records=records, rownames=rownames, colnames=colnames, form=form)
 
 
 class TimestandardForm(FlaskForm):
   more_swimmers = TextAreaField('More Free-text Swimmers')
-  timestandard = SelectField('Time Standards', choices=times_name_pair)
+  timestandard = SelectField('Qualifying Time Standards', choices=times_name_pair)
+  nationaltime = SelectField('National Time Standard', choices=national_times_name_pair)
   submit = SubmitField('Go')
 
 

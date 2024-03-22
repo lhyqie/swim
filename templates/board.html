@@ -94,13 +94,16 @@ input:checked + .slider:before {
                     <a href="https://www.pacswim.org/userfiles/cms/documents/809/agc-time-std.-scy-2023-2024-rev-9.18.23.pdf">{{colnames[i]}}</a>
                 {% elif colnames[i].startswith('FW') %}
                     <a href="https://www.pacswim.org/userfiles/cms/documents/859/fw-time-std.---spring-2024-rev-8.25.23.pdf"> {{colnames[i]}} </a>
+                {% elif colnames[i].endswith('@nt') %}    
+                    456
                 {% else %}
-                    {{ colnames[i] }}
+                    123
                 {% endif %}
+            {% elif colnames[i].endswith('@nt') %} 
+                📶
             {% else %}
-            <a href="https://swimstandards.com/swimmer/{{colnames[i]}}">
-                {{ colnames[i] }}
-            </a>
+                <a href="https://swimstandards.com/swimmer/{{colnames[i]}}">
+                {{ colnames[i] }}</a>
             {% endif %}
           </th>
           {% endfor %}
@@ -158,18 +161,20 @@ function copy_url() {
         url += "&id=";
     }
     const buttonChecked = document.querySelector('#headroom').checked;
+    var format = "{{format}}";
+    var step = (format == "records+nationaltime") ? 2 : 1;
     for (i = 2; i < th_list.length; ) {
       url += (th_list[i].innerText);
       if (buttonChecked) {
-        if ( i < th_list.length - 2) {
+        if ( i < th_list.length - 1 - step) {
           url += ",";
         }
-        i += 2;
+        i += 1 + step;
       } else {
-        if ( i < th_list.length - 1) {
+        if ( i < th_list.length  - step) {
           url += ",";
         }
-        i += 1;
+        i += step;
       }
     }
 
@@ -187,13 +192,16 @@ function copy_url() {
 
 function toggle_headroom_column() {
     const buttonChecked = document.querySelector('#headroom').checked;
+    var format = "{{format}}";
+    var step = (format == "records+nationaltime") ? 2 : 1;
     if (buttonChecked) {
         document.querySelectorAll('#swimmers tr').forEach((row, i) => {
             const cols = row.children.length;
-            for (let j = cols - 1 ; j > 1; j--) {
+            for (let j = cols - step ; j > 1; j-=step) {
                 const span = document.createElement("span");
                 if ( i == 0) {
                     span.innerHTML = "Δ";
+                    // span.innerHTML = "🔺";
                 }
                 else {
                     span.innerHTML = headroom(row.children[1].innerHTML.trim(), row.children[j].innerHTML.trim());
@@ -201,14 +209,17 @@ function toggle_headroom_column() {
                 const cell = document.createElement(i ? "td" : "th")
                 cell.appendChild(span)
                 cell.style.textAlign="center";
+                cell.classList.add("time-delta")
                 row.insertBefore(cell, row.children[j+1]);
             }
         });
     } else {
         document.querySelectorAll('#swimmers tr').forEach((row, i) => {
             const cols = row.children.length;
-            for (let j = cols - 1 ; j > 1; j-=2) {
-                row.removeChild(row.children[j])
+            for (let j = cols - 1 ; j >= 0; j--) {
+                if (row.children[j].classList.contains("time-delta")) {
+                    row.removeChild(row.children[j])
+                }
             }
         });
     }

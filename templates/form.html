@@ -30,8 +30,12 @@ Example: abby-chan,stella-canoles") }}
     <br/><br/>
     <input type="hidden" name="hidden_swimmers" id="hidden_swimmers" />
     {{ form.timestandard.label }}:
-    <br>
+    <br/><br/>
     {{ form.timestandard(size=9) }}
+    <br/><br/>
+    {{ form.nationaltime.label }}:
+    <br/><br/>
+    {{ form.nationaltime(size=6) }}
     <br/><br/>
     <input type="submit" name="Go" class="btn btn-info" value="Go" onclick="run()"/>
     <p><progress value="0" max="10000"></progress></p>

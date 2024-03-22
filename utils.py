@@ -5,8 +5,9 @@ from bs4 import BeautifulSoup
 from datetime import datetime
 from datetime import timedelta
 from flask import session
-from times import times_map
+from times import national_timemap,times_map
 
+import logging
 
 class Event:
   def __init__(self, entry):
@@ -160,12 +161,13 @@ class EventStore:
     return conn
 
 class ScoreBoard:
-  def __init__(self, time_standard) -> None:
+  def __init__(self, time_standard, national_time) -> None:
     self.board = []
     self.swimmers = []
     self.time_standard = time_standard
-    # TODO: replace with a real swimmer db.
+    self.national_time = national_time
     self.event_store = EventStore('swimmers.db')
+    logging.debug(f'self.national_time={self.national_time}')
 
   def add_time_standards(self):
     self.board.append(times_map[self.time_standard])
@@ -196,6 +198,21 @@ class ScoreBoard:
           time_map[swimmer] = self.board[i].get(rowname,'')
         records.append(time_map)
       return (records, rownames, colnames)
+    elif format == 'records+nationaltime':
+      rownames = [k for k, _ in self.board[0].items()]
+      colnames = []
+      for i, swimmer in enumerate(self.swimmers):
+        colnames.append(swimmer)
+        if i > 0: colnames.append(swimmer+'@nt')
+      records = []
+      for rowname in rownames:
+        time_map = {}  # for each row (event), record the fastest time per swimmer
+        for i, swimmer in enumerate(self.swimmers):
+          time_map[swimmer] = self.board[i].get(rowname,'')
+          if i > 0: time_map[swimmer+'@nt'] = self.national_time_standard(
+            event=rowname, timestr=time_map[swimmer], nationa_timemap=national_timemap[self.national_time])
+        records.append(time_map)
+      return (records, rownames, colnames)
     elif format == 'json':
       from json2html import convert
       jobj = {}
@@ -210,3 +227,26 @@ class ScoreBoard:
       return jobj
     else:
       return f'format {format} is not supported'
+
+  def national_time_standard(self, event:str, timestr:str, nationa_timemap) -> str:
+    def _toSeconds(timestr):
+      seconds = 0
+      tokens = timestr.split('.')
+      if len(tokens) == 2:
+        seconds += int(tokens[1]) / 100
+      parts = tokens[0].split(':')
+      if len(parts) == 2:
+        seconds += (int(parts[0]) if parts[0] else 0) * 60 + (int(parts[1]) if parts[1] else 0)
+      else:
+        seconds += int(parts[0]) if parts[0] else 0
+      return seconds;
+
+    res = '<B'
+    for standard in ['B', 'BB', 'A', 'AA', 'AAA', 'AAAA']:
+      standard_timestr = nationa_timemap[standard].get(event,'')
+      if not standard_timestr or not timestr: return ''
+      if _toSeconds(timestr) <= _toSeconds(standard_timestr):
+        res = standard
+      else:
+        break
+    return res

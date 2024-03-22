@@ -1,6 +1,6 @@
 # -------------------- Test Crawler --------------------------
-from utils import SwimStandardsCrawler
-crawler = SwimStandardsCrawler()
+# from utils import SwimStandardsCrawler
+# crawler = SwimStandardsCrawler()
 
 # for event in crawler.crawl_fastest_time('https://swimstandards.com/swimmer/abby-chan'):
 #   print(event)
@@ -40,10 +40,15 @@ crawler = SwimStandardsCrawler()
 # event_store.swimmer_fastest_time_to_db('abby-chan', events)
 
 # -------------------- Test ScoreBoard --------------------------
-# from utils import ScoreBoard
-# sb = ScoreBoard('JO-10-MALE')
-# sb.add_time_standards()
-# sb.add_swimmer('abby-chan')
+from utils import ScoreBoard
+sb = ScoreBoard(time_standard='JO-10-MALE', national_time='10-MALE')
+sb.add_time_standards()
+sb.add_swimmer('abby-chan')
+records, rownames, colnames = sb.gen_report(format="records+nationaltime")
+print('rownames:', rownames)
+print('colnames:', colnames)
+print('records:', records)
+
 # records, rownames, colnames = sb.gen_report(format="records")
 # print('rownames:', rownames)
 # print('colnames:', colnames)
