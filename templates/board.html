@@ -67,6 +67,35 @@ input:checked + .slider:before {
 .slider.round:before {
     border-radius: 50%;
 }
+
+/* table cell tooltip */
+.cell_with_comment{
+  position:relative;
+  text-decoration:underline;
+  text-decoration-style: dotted;
+}
+
+.cell_comment{
+  display:none;
+  position:absolute; 
+  z-index:100;
+  border:1px;
+  background-color:white;
+  border-style:solid;
+  border-width:1px;
+  border-color:rgba(103, 31, 31, 0.842);
+  padding:3px;
+  color:rgb(121, 190, 30); 
+  top:-60px; 
+  left:120px;
+  font-family: Arial;
+}
+
+.cell_with_comment:hover span.cell_comment{
+  color: white;
+  background: rgba(82, 119, 239, 0.95);
+  display:block;
+}
 </style>
 </head>
 
@@ -118,8 +147,16 @@ input:checked + .slider:before {
                 <td style="font-family: monospace;" class="standards"> {{ records[i][colnames[j]] }}  </td>
             {% elif j > 0 and compare_time(records[i][colnames[j]], records[i][colnames[0]]) %}
                 <td style="font-family: monospace;" class="qualified"> {{ records[i][colnames[j]] }} </td>
-            {% else %}   
-                <td style="font-family: monospace;"> {{ records[i][colnames[j]] }}  </td>
+            {% elif (nationaltime|length) > 0 %}   
+                {% if j > 0 and j % 2 == 0 and (national_time_tool_tip(national_timemap[nationaltime], rownames[i])|length) > 0%}
+                <td style="font-family: monospace;" class="cell_with_comment"> {{ records[i][colnames[j]] }}  
+                <span class="cell_comment"> {{national_time_tool_tip(national_timemap[nationaltime], rownames[i])}} </span>
+                </td>
+                {% else %}
+                <td style="font-family: monospace;"> {{ records[i][colnames[j]] }} </td>
+                {% endif %}
+            {% else %}
+                <td style="font-family: monospace;" class="cell_with_comment"> {{ records[i][colnames[j]] }} </td>
             {% endif %}            
           {% endfor %}
       </tr>

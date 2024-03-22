@@ -239,12 +239,12 @@ class ScoreBoard:
         seconds += int(parts[0]) if parts[0] else 0
       return seconds;
 
-    res = "<B".rjust(4, '\u00A0') + nationa_timemap['B'].get(event,'').rjust(9,'\u00A0')
+    res = "<B"
     for standard in ['B', 'BB', 'A', 'AA', 'AAA', 'AAAA']:
       standard_timestr = nationa_timemap[standard].get(event,'')
       if not standard_timestr or not timestr: return ''
       if _toSeconds(timestr) <= _toSeconds(standard_timestr):
-        res = standard.rjust(4, '\u00A0')+standard_timestr.rjust(9, '\u00A0')
+        res = standard
       else:
         break
     return res

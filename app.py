@@ -4,7 +4,7 @@ from flask_wtf import FlaskForm
 from utils import ScoreBoard
 from wtforms import SelectField, SubmitField, TextAreaField
 from swimmers import predefined_swimmers
-from times import times_name_pair, national_times_name_pair
+from times import times_name_pair, national_times_name_pair, national_timemap
 
 import logging
 import sqlite3
@@ -15,7 +15,7 @@ app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY') or 'you-will-never-guess
 app.config['PERMANENT_SESSION_LIFETIME'] =  timedelta(minutes=5)
 
 @app.context_processor
-def utility_processor():
+def utility_processor_compare_time():
     def compare_time(time1: str, time2: str) -> bool:
       if time1 == '' or time2 == '': return False
       try:
@@ -25,6 +25,17 @@ def utility_processor():
         return False
       return timeint1 < timeint2
     return dict(compare_time=compare_time)
+
+@app.context_processor
+def utility_processor_national_time_tool_tip():
+    def national_time_tool_tip(timemap:dict, event:str) -> str:
+      res = ''
+      for standard, map in timemap.items():
+        for event_name, time in map.items():
+          if event_name == event and time:
+            res += f'{standard}:\u00A0{time}\u000A'
+      return res
+    return dict(national_time_tool_tip=national_time_tool_tip)
 
 
 @app.route('/', methods=('GET', 'POST'))
@@ -72,7 +83,7 @@ def board(format='records+nationaltime'):
        logging.debug('Finished. response:{response}')
        return response
 
-    return render_template('board.html', nationaltime=nationaltime, 
+    return render_template('board.html', nationaltime=nationaltime, national_timemap=national_timemap,
                            records=records, rownames=rownames, colnames=colnames, form=form)
 
 
