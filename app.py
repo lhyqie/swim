@@ -72,7 +72,8 @@ def board(format='records+nationaltime'):
        logging.debug('Finished. response:{response}')
        return response
 
-    return render_template('board.html', format=format, records=records, rownames=rownames, colnames=colnames, form=form)
+    return render_template('board.html', nationaltime=nationaltime, 
+                           records=records, rownames=rownames, colnames=colnames, form=form)
 
 
 class TimestandardForm(FlaskForm):
