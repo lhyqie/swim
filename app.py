@@ -31,10 +31,13 @@ def utility_processor():
 @app.route('/board', methods=('GET', 'POST'))
 def board(format='records+nationaltime'):
   timestandard = request.args.get('ts') or session.get('ts') or 'JO-10-MALE'
-  nationaltime = request.args.get('nt') or session.get('nt') or '10-MALE'
+  nationaltime = request.args.get('nt') or session.get('nt') or ''
+  if nationaltime == '': format = 'records'
+  
   logging.debug(f'request.method={request.method}')
   logging.debug(f'timestandard={timestandard}')
   logging.debug(f'nationaltime={nationaltime}')
+  logging.debug(f'format={format}')
 
   sb = ScoreBoard(time_standard=timestandard, national_time=nationaltime)
   sb.add_time_standards()
@@ -55,7 +58,7 @@ def board(format='records+nationaltime'):
 
   if request.method == 'POST':
     session['ts'] = request.form.get('timestandard','JO-10-MALE')
-    session['nt'] = request.form.get('nationaltime','10-MALE')
+    session['nt'] = request.form.get('nationaltime','')
     session['swimmers'] = request.form['hidden_swimmers']
     if len(request.form['more_swimmers']) and len(request.form['more_swimmers'].split(',')) >= 1:
        session['swimmers'] += (',' if session['swimmers'] else '') + request.form['more_swimmers']
@@ -74,7 +77,7 @@ def board(format='records+nationaltime'):
 
 class TimestandardForm(FlaskForm):
   more_swimmers = TextAreaField('More Free-text Swimmers')
-  timestandard = SelectField('Qualifying Time Standards', choices=times_name_pair)
+  timestandard = SelectField('Qualifying Time Standards', choices=times_name_pair, default="JO-10-MALE")
   nationaltime = SelectField('National Time Standard', choices=national_times_name_pair)
   submit = SubmitField('Go')
 

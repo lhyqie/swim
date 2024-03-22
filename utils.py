@@ -7,7 +7,6 @@ from datetime import timedelta
 from flask import session
 from times import national_timemap,times_map
 
-import logging
 
 class Event:
   def __init__(self, entry):
@@ -167,7 +166,6 @@ class ScoreBoard:
     self.time_standard = time_standard
     self.national_time = national_time
     self.event_store = EventStore('swimmers.db')
-    logging.debug(f'self.national_time={self.national_time}')
 
   def add_time_standards(self):
     self.board.append(times_map[self.time_standard])
