@@ -4,6 +4,9 @@
 <title>Swimmers and Time Standards ScoreBoard</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" crossorigin="anonymous">
 <link rel="stylesheet" type= "text/css" href= "{{ url_for('static',filename='table.css') }}">
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 <style>
 body {
     margin: 20px;
@@ -60,6 +63,10 @@ input:checked + .slider:before {
 }
 
 /* Rounded sliders */
+.tooltip{
+   font-family: monospace;
+}
+
 .slider.round {
     border-radius: 34px;
 }
@@ -144,19 +151,22 @@ input:checked + .slider:before {
           <td> {{ rownames[i] }} </td>
           {% for j in range(colnames | length): %}
             {% if j == 0 %}
-                <td style="font-family: monospace;" class="standards"> {{ records[i][colnames[j]] }}  </td>
+                <td class="standards"> {{ records[i][colnames[j]] }}  </td>
             {% elif j > 0 and compare_time(records[i][colnames[j]], records[i][colnames[0]]) %}
-                <td style="font-family: monospace;" class="qualified"> {{ records[i][colnames[j]] }} </td>
+                <td class="qualified"> {{ records[i][colnames[j]] }} </td>
             {% elif (nationaltime|length) > 0 %}   
                 {% if j > 0 and j % 2 == 0 and (national_time_tool_tip(national_timemap[nationaltime], rownames[i])|length) > 0%}
-                <td style="font-family: monospace;" class="cell_with_comment"> {{ records[i][colnames[j]] }}  
-                <span class="cell_comment"> {{national_time_tool_tip(national_timemap[nationaltime], rownames[i])}} </span>
+                <td class="cell_with_comment">
+                <span class="cell_with_comment" data-toggle="tooltip" data-placement="bottom" title="{{national_time_tool_tip(national_timemap[nationaltime], rownames[i])}}">
+                {{ records[i][colnames[j]] }}  
+                </span>
                 </td>
+                
                 {% else %}
-                <td style="font-family: monospace;"> {{ records[i][colnames[j]] }} </td>
+                <td> {{ records[i][colnames[j]] }} </td>
                 {% endif %}
             {% else %}
-                <td style="font-family: monospace;" class="cell_with_comment"> {{ records[i][colnames[j]] }} </td>
+                <td> {{ records[i][colnames[j]] }} </td>
             {% endif %}            
           {% endfor %}
       </tr>
@@ -253,7 +263,6 @@ function toggle_headroom_column() {
                 const cell = document.createElement(i ? "td" : "th")
                 cell.appendChild(span)
                 cell.style.textAlign="center";
-                cell.style.fontFamily="monospace";
                 cell.classList.add("time-delta")
                 row.insertBefore(cell, row.children[j+1]);
             }
@@ -318,6 +327,8 @@ function headroom(timestr1, timestr2){
         return "+"+toTimeStr(sec2-sec1);
     }
 }
+
+$(function () {$('[data-toggle="tooltip"]').tooltip()})
 </script>
 
 </body>

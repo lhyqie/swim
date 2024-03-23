@@ -33,8 +33,9 @@ def utility_processor_national_time_tool_tip():
       for standard, map in timemap.items():
         for event_name, time in map.items():
           if event_name == event and time:
+            standard = standard.rjust(4, '\u00A0')
             res += f'{standard}:\u00A0{time}\u000A'
-      return res
+      return res.strip()
     return dict(national_time_tool_tip=national_time_tool_tip)
 
 
