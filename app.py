@@ -113,12 +113,12 @@ def card():
 
 class ScoreBoardForm(FlaskForm):
   more_swimmers = TextAreaField('More Free-text Swimmers')
-  timestandard = SelectField('Qualifying Time Standards', choices=times_name_pair, default="JO-10-MALE")
-  nationaltime = SelectField('National Time Standard', choices=national_times_name_pair)
+  timestandard = SelectField('Championship Meet Qualifying Time Standards', choices=times_name_pair, default="JO-10-MALE")
+  nationaltime = SelectField('(Optional) National Age Group Motivational Time', choices=national_times_name_pair)
 
 
 class ScoreCardForm(FlaskForm):
-  nationaltime = SelectField('National Time Standard', choices=national_times_name_pair, default="10-MALE")
+  nationaltime = SelectField('National Age Group Motivational Time', choices=national_times_name_pair, default="10-MALE")
 
 
 @app.route('/compare/', methods=('GET', 'POST'))
