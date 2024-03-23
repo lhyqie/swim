@@ -281,7 +281,6 @@ class ScoreCard:
   def gen_report(self):
     if not self.swimmer: return [], [], []
     rownames = [k for k, _ in self.board[1].items()]
-    print('rownames')
     colnames = []
     for i, swimmer in enumerate(self.swimmers):
       colnames.append(swimmer)

@@ -88,22 +88,25 @@ def board(format='records+nationaltime'):
                            records=records, rownames=rownames, colnames=colnames, form=form)
 
 
-@app.route('/', methods=('GET', 'POST'))
 @app.route('/card', methods=('GET', 'POST'))
 def card():
+  if request.method == 'POST':
+    session['swimmer'] = request.form.get('swimmer_id','')
+    session['nt'] = request.form.get('nationaltime','')
+    logging.debug(f'request.arg: {request.args}')
+    logging.debug(f"session[swimmer]:{session['swimmer']}")
+    return redirect(url_for('card', **request.args))
+  
   swimmer = request.args.get('id') or session.get('swimmer')
+  if not swimmer:
+    return redirect(url_for('form2', **request.args))
+
   nationaltime = request.args.get('nt') or session.get('nt') or ''
   logging.debug(f'swimmer={swimmer}')
   sc = ScoreCard(swimmer, nationaltime)
   records, rownames, colnames = sc.gen_report()
   logging.debug(f'records size={len(records)}, rownames size={len(rownames)}, colnames size={len(colnames)}')
 
-  if request.method == 'POST':
-    session['swimmer'] = request.form['swimmer_id']
-    session['nt'] = request.form.get('nationaltime','')
-    logging.debug(f'request.arg: {request.args}')
-    logging.debug(f"session[swimmer]:{session['swimmer']}")
-    return redirect(url_for('card', **request.args))
   return render_template('card.html', nationaltime=nationaltime, national_timemap=national_timemap,
                          records=records, rownames=rownames, colnames=colnames, form=form)
 
@@ -125,6 +128,7 @@ def form():
   return render_template('form.html', predefined_swimmers=predefined_swimmers, form=form)
 
 @app.route('/swimmer/', methods=('GET', 'POST'))
+@app.route('/swim/', methods=('GET', 'POST'))
 def form2():
   form = ScoreCardForm()
   return render_template('form2.html', predefined_swimmers=predefined_swimmers, form=form)

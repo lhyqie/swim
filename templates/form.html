@@ -2,30 +2,32 @@
 <html>
 <head>
 <title>Time Standards vs Swimmers</title>
-<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='table.css') }}">
+<link rel="stylesheet" type="text/css" href= "{{ url_for('static',filename='table.css') }}">
 <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.2/css/bootstrap-select.min.css">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
 <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.2/css/bootstrap-select.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.2/js/bootstrap-select.min.js"></script>
 </head>
 
 <h3 align="center" id="banner">Time Standards vs Swimmers</h3>
 
 <div class="container">
-<br/><br/>
+<br/>
 <form id="multiple_select_form" action="/board" method="post">
-    <b>Swimmers:</b> 
-    <br/>
-    <select name="swimmers" id="swimmers" class="selectpicker" data-width="auto" data-live-search="true" multiple>
-    {% for swimmer in predefined_swimmers: %}
-        <option value="{{swimmer}}">{{swimmer}}</option>
-    {% endfor %}
-    </select>
-    <br/><br/>
-    {{ form.more_swimmers.label }} 
-    <br/>
-    {{ form.more_swimmers(cols="50", rows="6",placeholder="Enter comma separated swimmer ids from https://swimstandards.com/
+<br/>
+<a href="/swim" id="goback" class="btn btn-primary btn-lg">To Single Swimmer View</a>
+<br/><br/>
+<b>Pick one or more Swimmers</b>  &nbsp;&nbsp;
+<select name="swimmers" id="swimmers" class="selectpicker" data-width="auto" data-live-search="true" multiple>  
+{% for swimmer in predefined_swimmers: %}
+    <option value="{{swimmer}}">{{swimmer}}</option>
+{% endfor %}
+</select>
+<br/><br/>
+{{ form.more_swimmers.label }} 
+<br/><br/>
+{{ form.more_swimmers(cols="50", rows="6",placeholder="Enter comma separated swimmer ids from https://swimstandards.com/
 Example: abby-chan,stella-canoles") }}
     <br/><br/>
     <input type="hidden" name="hidden_swimmers" id="hidden_swimmers" />
@@ -37,75 +39,41 @@ Example: abby-chan,stella-canoles") }}
     <br/><br/>
     {{ form.nationaltime(size=6) }}
     <br/><br/>
-    <input type="submit" name="Go" class="btn btn-info" value="Go" onclick="run()"/>
-    <p><progress value="0" max="10000"></progress></p>
+    <input type="submit" name="Go" class="btn btn-info" value="Go"/>
+    <br/>
+    <img src="{{ url_for('static',filename='loading_icon.gif') }}" id="loading" style="display: none;">
 </form>
 </div>
 
-<script>
-    // For Process bar animation
-    let i, start, val;
-    const progress = document.getElementsByTagName("progress")[0];
-    progress.value = 0
-    function run() {
-        // number of swimmers from select list.
-        swimmer_count = String($("#swimmers").val()).split(',').length;
-        // console.log('swimmer_count:' + swimmer_count)
-        
-        i = 0;
-        val = 0;
-        start = performance.now();
-        requestAnimationFrame(animateProgress);
-    }
-    function animateProgress() {
-        const next = loop().next();
-        if (!next.done) {
-            progress.value = next.value;
-            frame = requestAnimationFrame(animateProgress);
-        }
-        else
-            console.log(`Calculations took ${performance.now() - start}ms`);
-    }
-    function* loop() {
-        let j;
-        while (i < 10000) {
-            // more swimmer then slower to move process bar.
-            for (j = 0; j < 1000 / (1 + swimmer_count) ; j++) {
-                ++val;
-            }
-            ++i;
-            yield val;
-        }
-    }
-
-    // For Multi-select form on submit action.
-    $(document).ready(function () {
-        $('.selectpicker').selectpicker();
-        $('#swimmers').change(function () {
-            $('#hidden_swimmers').val($('#swimmers').val());
-        });
-        $('#multiple_select_form').on('submit', function (event) {
-
-            event.preventDefault();
-            if ($('#swimmers').val() != '') {
-                var form_data = $(this).serialize();
-                $.ajax({
-                    url: "/board",
-                    method: "POST",
-                    data: form_data,
-                    success: function (data) {
-                        // console.log(data);
-                        // alert(data);
-                        $('#hidden_swimmers').val('');
-                        $('.selectpicker').selectpicker('val', '');
-                        document.location.href = '/board'
-                    }
-                })
-            } else {
-                alert("Please select framework");
-                return false;
-            }
-        });
+<script>    
+// For Multi-select form on submit action.
+$(document).ready(function () {
+    $('.selectpicker').selectpicker();
+    $('#swimmers').change(function () {
+        $('#hidden_swimmers').val($('#swimmers').val());
     });
+    $('#multiple_select_form').on('submit', function (event) {
+        $('#loading').show();
+        event.preventDefault();
+        if ($('#swimmers').val() != '') {
+            var form_data = $(this).serialize();
+            $.ajax({
+                url: "/board",
+                method: "POST",
+                data: form_data,
+                success: function (data) {
+                    // console.log(data);
+                    // alert(data);
+                    $('#hidden_swimmers').val('');
+                    $('.selectpicker').selectpicker('val', '');
+                    document.location.href = '/board'
+                }
+            })
+        } else {
+            alert("Please select framework");
+            return false;
+        }
+    });
+});
 </script>
 </html>

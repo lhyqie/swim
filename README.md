@@ -19,6 +19,6 @@ and JO-10-MALE is defined from times.py
 
 example: /card?id=carlos-li&nt=10-MALE
 
-2. /swimmer/ pick one swimmer and National Time from form.
+2./swim pick one swimmer and National Time from form.
 
-example: /swimmer
+example: /swim
