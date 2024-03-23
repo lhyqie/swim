@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup
 from datetime import datetime
 from datetime import timedelta
 from flask import session
-from times import national_timemap,times_map
+from times import national_timemap,times_map,times_name_pair
 
 
 class Event:
@@ -37,6 +37,30 @@ class FastestEvent:
     # return f'{self.event_name:12s} ({self.age}) | {self.time:7s} | {self.date} | {self.swim_meet}'
     # return f'{self.event_name:12s} ({self.age}) | {self.time:7s}'
     return f'{self.event_name:12s} | {self.time:7s}'
+
+
+def national_time_standard(event:str, timestr:str, national_timemap) -> str:
+    def _toSeconds(timestr):
+      seconds = 0
+      tokens = timestr.split('.')
+      if len(tokens) == 2:
+        seconds += int(tokens[1]) / 100
+      parts = tokens[0].split(':')
+      if len(parts) == 2:
+        seconds += (int(parts[0]) if parts[0] else 0) * 60 + (int(parts[1]) if parts[1] else 0)
+      else:
+        seconds += int(parts[0]) if parts[0] else 0
+      return seconds;
+
+    res = "<B"
+    for standard in ['B', 'BB', 'A', 'AA', 'AAA', 'AAAA']:
+      standard_timestr = national_timemap[standard].get(event,'')
+      if not standard_timestr or not timestr: return ''
+      if _toSeconds(timestr) <= _toSeconds(standard_timestr):
+        res = standard
+      else:
+        break
+    return res
 
 
 class SwimStandardsCrawler:
@@ -159,6 +183,7 @@ class EventStore:
     conn.row_factory = sqlite3.Row
     return conn
 
+# A score board is to represent one timestand and optional national time and muliple swimmers.
 class ScoreBoard:
   def __init__(self, time_standard, national_time) -> None:
     self.board = []
@@ -207,8 +232,8 @@ class ScoreBoard:
         time_map = {}  # for each row (event), record the fastest time per swimmer
         for i, swimmer in enumerate(self.swimmers):
           time_map[swimmer] = self.board[i].get(rowname,'')
-          if i > 0: time_map[swimmer+'@nt'] = self.national_time_standard(
-            event=rowname, timestr=time_map[swimmer], nationa_timemap=national_timemap[self.national_time])
+          if i > 0: time_map[swimmer+'@nt'] = national_time_standard(
+            event=rowname, timestr=time_map[swimmer], national_timemap=national_timemap[self.national_time])
         records.append(time_map)
       return (records, rownames, colnames)
     elif format == 'json':
@@ -226,25 +251,47 @@ class ScoreBoard:
     else:
       return f'format {format} is not supported'
 
-  def national_time_standard(self, event:str, timestr:str, nationa_timemap) -> str:
-    def _toSeconds(timestr):
-      seconds = 0
-      tokens = timestr.split('.')
-      if len(tokens) == 2:
-        seconds += int(tokens[1]) / 100
-      parts = tokens[0].split(':')
-      if len(parts) == 2:
-        seconds += (int(parts[0]) if parts[0] else 0) * 60 + (int(parts[1]) if parts[1] else 0)
-      else:
-        seconds += int(parts[0]) if parts[0] else 0
-      return seconds;
+  
+# A score card is to represent one swimmer, his/her national time and all timestandards.
+class ScoreCard:
+  def __init__(self, swimmer, nationaltime) -> None:
+    self.board = []
+    self.swimmer = swimmer
+    self.swimmers = []
+    self.national_time = nationaltime
+    self.event_store = EventStore('swimmers.db')
+    # the first column is swimmmer, the next columns are time standards.
+    self._add_swimmer_to_board()    
+    self._add_all_time_standards_to_board()
+    
+  def _add_swimmer_to_board(self):
+    if not self.swimmer: return
+    self.swimmers.append(self.swimmer)
+    column = {}
+    events = self.event_store.swimmer_fastest_time(self.swimmer, use_cache=True)
+    for event in events:
+      column[event.event_name] = event.time
+    self.board.append(column)
 
-    res = "<B"
-    for standard in ['B', 'BB', 'A', 'AA', 'AAA', 'AAAA']:
-      standard_timestr = nationa_timemap[standard].get(event,'')
-      if not standard_timestr or not timestr: return ''
-      if _toSeconds(timestr) <= _toSeconds(standard_timestr):
-        res = standard
-      else:
-        break
-    return res
+  def _add_all_time_standards_to_board(self):
+    for times_name, _ in times_name_pair:
+      self.board.append(times_map[times_name])
+      self.swimmers.append(times_name)
+
+  def gen_report(self):
+    if not self.swimmer: return [], [], []
+    rownames = [k for k, _ in self.board[1].items()]
+    print('rownames')
+    colnames = []
+    for i, swimmer in enumerate(self.swimmers):
+      colnames.append(swimmer)
+      if i == 0: colnames.append(swimmer+'@nt')
+    records = []
+    for rowname in rownames:
+      time_map = {}  # for each row (event), record the fastest time per swimmer
+      for i, swimmer in enumerate(self.swimmers):
+        time_map[swimmer] = self.board[i].get(rowname,'')
+        if i == 0 and self.national_time: time_map[swimmer+'@nt'] = national_time_standard(
+          event=rowname, timestr=time_map[swimmer], national_timemap=national_timemap[self.national_time])
+      records.append(time_map)
+    return (records, rownames, colnames)

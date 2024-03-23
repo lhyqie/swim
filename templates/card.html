@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Swimmers and Time Standards ScoreBoard</title>
+<title>Swimmer and Time Standards ScoreCard</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" crossorigin="anonymous">
 <link rel="stylesheet" type= "text/css" href= "{{ url_for('static',filename='table.css') }}">
 <style>
@@ -100,8 +100,8 @@ input:checked + .slider:before {
 </head>
 
 <body>
-<h3 id="banner">Swimmers vs Time Standards</h3>
-<a href="/compare" id="goback" class="btn btn-primary btn-sm">Back to Selection</a> &nbsp;&nbsp;
+<h3 id="banner">Swimmer vs Time Standards</h3>
+<a href="/swimmer" id="goback" class="btn btn-primary btn-sm">Back to Selection</a> &nbsp;&nbsp;
 <button type="button" class="btn btn-secondary btn-sm" onclick="copy_url()">Share</button>
 &nbsp;&nbsp;<a id="url_text" href=""></a>
 <br/><br/>
@@ -119,20 +119,21 @@ input:checked + .slider:before {
           {% for i in range(colnames | length): %}
             {% if i == 0 %}
             <th>
-                {% if colnames[i].startswith('JO')%}
-                    <a href="https://www.pacswim.org/userfiles/cms/documents/809/agc-time-std.-scy-2023-2024-rev-9.18.23.pdf">{{colnames[i]}}</a>
-                {% elif colnames[i].startswith('FW') %}
-                    <a href="https://www.pacswim.org/userfiles/cms/documents/859/fw-time-std.---spring-2024-rev-8.25.23.pdf"> {{colnames[i]}} </a>
-                {% endif %}
+              <a href="https://swimstandards.com/swimmer/{{colnames[i]}}">
+              {{ colnames[i] }}</a>
             </th>
-            {% elif colnames[i].endswith('@nt') %} 
+            {% elif i == 1 %} 
             <th id="{{nationaltime}}" style="text-align:center;"> 
                 <a href="https://www.pacswim.org/userfiles/cms/documents/801/2021-2024-national-age-group-motivational-times.pdf"> {{nationaltime}} 
-                </a> </th>
+                </a> 
+            </th>
             {% else %}
             <th>
-                <a href="https://swimstandards.com/swimmer/{{colnames[i]}}">
-                {{ colnames[i] }}</a>
+              {% if colnames[i].startswith('JO')%}
+                  <a href="https://www.pacswim.org/userfiles/cms/documents/809/agc-time-std.-scy-2023-2024-rev-9.18.23.pdf">{{colnames[i]}}</a>
+              {% elif colnames[i].startswith('FW') %}
+                  <a href="https://www.pacswim.org/userfiles/cms/documents/859/fw-time-std.---spring-2024-rev-8.25.23.pdf"> {{colnames[i]}} </a>
+              {% endif %}
             </th>
             {% endif %}
           {% endfor %}
@@ -145,10 +146,10 @@ input:checked + .slider:before {
           {% for j in range(colnames | length): %}
             {% if j == 0 %}
                 <td style="font-family: monospace;" class="standards"> {{ records[i][colnames[j]] }}  </td>
-            {% elif j > 0 and compare_time(records[i][colnames[j]], records[i][colnames[0]]) %}
+            {% elif j > 0 and compare_time(records[i][colnames[0]], records[i][colnames[j]]) %}
                 <td style="font-family: monospace;" class="qualified"> {{ records[i][colnames[j]] }} </td>
             {% elif (nationaltime|length) > 0 %}   
-                {% if j > 0 and j % 2 == 0 and (national_time_tool_tip(national_timemap[nationaltime], rownames[i])|length) > 0%}
+                {% if j == 1 and (national_time_tool_tip(national_timemap[nationaltime], rownames[i])|length) > 0 %}
                 <td style="font-family: monospace;" class="cell_with_comment"> {{ records[i][colnames[j]] }}  
                 <span class="cell_comment"> {{national_time_tool_tip(national_timemap[nationaltime], rownames[i])}} </span>
                 </td>
@@ -192,36 +193,14 @@ function copy_url() {
     if (th_list.length <= 1) {
         return;
     } 
-    var url = "http://qualihub.net/board?"
-    url += "ts="+th_list[1].innerText;
-    // check if nationaltime id is present
-    for (var i = 0; i < th_list.length; i++) {
+    var url = "http://qualihub.net/card?"
+    url += "id="+th_list[1].innerText;
+    for (var i = 2; i < th_list.length; i++) {
         if (th_list[i].id.length > 0) {
             url += "&nt="+th_list[i].id;
             break;
         }
     }
-    if (th_list.length > 2) {
-        url += "&id=";
-    }
-    const buttonChecked = document.querySelector('#headroom').checked;
-    var nationaltime = "{{nationaltime}}";
-    var step = (nationaltime.length > 0) ? 2 : 1;
-    for (i = 2; i < th_list.length; ) {
-      url += (th_list[i].innerText);
-      if (buttonChecked) {
-        if ( i < th_list.length - 1 - step) {
-          url += ",";
-        }
-        i += 1 + step;
-      } else {
-        if ( i < th_list.length  - step) {
-          url += ",";
-        }
-        i += step;
-      }
-    }
-
     // console.log(url);
     document.getElementById("url_text").innerHTML = url;
     document.getElementById("url_text").href = url;
@@ -236,19 +215,17 @@ function copy_url() {
 
 function toggle_headroom_column() {
     const buttonChecked = document.querySelector('#headroom').checked;
-    var nationaltime = "{{nationaltime}}";
-    var step = (nationaltime.length > 0) ? 2 : 1;
     if (buttonChecked) {
         document.querySelectorAll('#swimmers tr').forEach((row, i) => {
             const cols = row.children.length;
-            for (let j = cols - step ; j > 1; j-=step) {
+            for (let j = cols - 1 ; j >= 3; j-=1) {
                 const span = document.createElement("span");
                 if ( i == 0) {
                     span.innerHTML = "Δ";
                     // span.innerHTML = "🔺";
                 }
                 else {
-                    span.innerHTML = headroom(row.children[1].innerHTML.trim(), row.children[j].innerHTML.trim());
+                    span.innerHTML = headroom(row.children[j].innerHTML.trim(), row.children[1].innerHTML.trim());
                 }
                 const cell = document.createElement(i ? "td" : "th")
                 cell.appendChild(span)

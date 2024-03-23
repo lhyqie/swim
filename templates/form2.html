@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>One Swimmer vs All Time Standards</title>
+<link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='table.css') }}">
+<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.2/css/bootstrap-select.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.2/js/bootstrap-select.min.js"></script>
+</head>
+
+<h3 align="center" id="banner">One Swimmer vs All Time Standards</h3>
+
+<div class="container">
+<br/><br/>
+<form id="select_form" action="/card" method="post">
+<br/><br/>
+<b>Pick one swimmer</b> &nbsp;&nbsp;
+<select name="swimmer_id" id="swimmer_id" class="selectpicker" data-width="auto" data-live-search="true">
+    <option disabled selected value> -- select a swimmer -- </option>
+    {% for swimmer in predefined_swimmers: %}
+    <option value="{{swimmer}}">{{swimmer}}</option>
+    {% endfor %}
+</select>
+<br/><br/>
+{{ form.nationaltime.label }}:
+<br/><br/>
+{{ form.nationaltime(size=6) }}
+<br/><br/>
+<input type="submit" name="Go" class="btn btn-info" value="Go"/>
+<br/><br/>
+<p><progress value="0" max="10000"></progress></p>
+</form>
+</div>
+
+<script>
+    // For Process bar animation
+    let i, start, val;
+    const progress = document.getElementsByTagName("progress")[0];
+    progress.value = 0
+    function run() {
+        i = 0;
+        val = 0;
+        start = performance.now();
+        requestAnimationFrame(animateProgress);
+    }
+    function animateProgress() {
+        const next = loop().next();
+        if (!next.done) {
+            progress.value = next.value;
+            frame = requestAnimationFrame(animateProgress);
+        }
+        else
+            console.log(`Calculations took ${performance.now() - start}ms`);
+    }
+    function* loop() {
+        let j;
+        while (i < 10000) {
+            for (j = 0; j < 1000 ; j++) {
+                ++val;
+            }
+            ++i;
+            yield val;
+        }
+    }
+</script>
+</html>

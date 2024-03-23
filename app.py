@@ -1,8 +1,8 @@
 from datetime import timedelta
 from flask import Flask, render_template, request, session, redirect, url_for, after_this_request
 from flask_wtf import FlaskForm
-from utils import ScoreBoard
-from wtforms import SelectField, SubmitField, TextAreaField
+from utils import ScoreBoard, ScoreCard
+from wtforms import SelectField, TextAreaField
 from swimmers import predefined_swimmers
 from times import times_name_pair, national_times_name_pair, national_timemap
 
@@ -87,17 +87,46 @@ def board(format='records+nationaltime'):
                            records=records, rownames=rownames, colnames=colnames, form=form)
 
 
-class TimestandardForm(FlaskForm):
+@app.route('/', methods=('GET', 'POST'))
+@app.route('/card', methods=('GET', 'POST'))
+def card():
+  swimmer = request.args.get('id') or session.get('swimmer')
+  nationaltime = request.args.get('nt') or session.get('nt') or ''
+  logging.debug(f'swimmer={swimmer}')
+  sc = ScoreCard(swimmer, nationaltime)
+  records, rownames, colnames = sc.gen_report()
+  logging.debug(f'records size={len(records)}, rownames size={len(rownames)}, colnames size={len(colnames)}')
+
+  if request.method == 'POST':
+    session['swimmer'] = request.form['swimmer_id']
+    session['nt'] = request.form.get('nationaltime','')
+    logging.debug(f'request.arg: {request.args}')
+    logging.debug(f"session[swimmer]:{session['swimmer']}")
+    return redirect(url_for('card', **request.args))
+  return render_template('card.html', nationaltime=nationaltime, national_timemap=national_timemap,
+                         records=records, rownames=rownames, colnames=colnames, form=form)
+
+
+class ScoreBoardForm(FlaskForm):
   more_swimmers = TextAreaField('More Free-text Swimmers')
   timestandard = SelectField('Qualifying Time Standards', choices=times_name_pair, default="JO-10-MALE")
   nationaltime = SelectField('National Time Standard', choices=national_times_name_pair)
-  submit = SubmitField('Go')
 
 
+class ScoreCardForm(FlaskForm):
+  nationaltime = SelectField('National Time Standard', choices=national_times_name_pair, default="10-MALE")
+
+
+@app.route('/compare/', methods=('GET', 'POST'))
 @app.route('/select/', methods=('GET', 'POST'))
 def form():
-  form = TimestandardForm()
+  form = ScoreBoardForm()
   return render_template('form.html', predefined_swimmers=predefined_swimmers, form=form)
+
+@app.route('/swimmer/', methods=('GET', 'POST'))
+def form2():
+  form = ScoreCardForm()
+  return render_template('form2.html', predefined_swimmers=predefined_swimmers, form=form)
   
 
 @app.route('/cache/')

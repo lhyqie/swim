@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Swimmer and Time Standards</title>
+<title>Time Standards vs Swimmers</title>
 <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='table.css') }}">
 <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
@@ -10,7 +10,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.2/js/bootstrap-select.min.js"></script>
 </head>
 
-<h3 align="center" id="banner">Swimmers vs Time Standards</h3>
+<h3 align="center" id="banner">Time Standards vs Swimmers</h3>
 
 <div class="container">
 <br/><br/>
@@ -18,9 +18,9 @@
     <b>Swimmers:</b> 
     <br/>
     <select name="swimmers" id="swimmers" class="selectpicker" data-width="auto" data-live-search="true" multiple>
-        {% for swimmer in predefined_swimmers: %}
-            <option value="{{swimmer}}">{{swimmer}}</option>
-        {% endfor %}
+    {% for swimmer in predefined_swimmers: %}
+        <option value="{{swimmer}}">{{swimmer}}</option>
+    {% endfor %}
     </select>
     <br/><br/>
     {{ form.more_swimmers.label }} 
