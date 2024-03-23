@@ -306,6 +306,29 @@ function headroom(timestr1, timestr2){
 }
 
 $(function () {$('[data-toggle="tooltip"]').tooltip()})
+
+$(document).ready(function () {
+    $('#swimmers thead tr').each(function() {
+        $(this).find("th").each(function(cellIndex) {
+            var text = $(this).text().trim();
+            if (text.includes("FEMALE")) {
+                if (text.startsWith("JO") || text.startsWith("FW")) {
+                    $(this).css({"background-color":"#c40e0eee"});
+                } else {
+                    $(this).css({"background-color":"#d60e0ecc"});
+                }
+                
+            } else if (text.includes("MALE")) {
+                if (text.startsWith("JO") || text.startsWith("FW")) {
+                    $(this).css({"background-color":"#0608b3e2"});
+                } else {
+                    $(this).css({"background-color":"#0808b3b6"});
+                }
+                
+            }
+        });
+    });
+})
 </script>
 
 </body>

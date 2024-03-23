@@ -1,14 +1,14 @@
 # From https://www.pacswim.org/userfiles/cms/documents/809/agc-time-std.-scy-2023-2024-rev-9.18.23.pdf
 # and https://www.pacswim.org/userfiles/cms/documents/859/fw-time-std.---spring-2024-rev-8.25.23.pdf
 times_name_pair = [
-  ("JO-10-MALE",        "Age Group Championship (Junior Olympics) 10 and Under Men"), 
-  ("JO-10-FEMALE",      "Age Group Championship (Junior Olympics) 10 and Under Women"),
-  ("JO-11-MALE",        "Age Group Championship (Junior Olympics) 11 Men"), 
-  ("JO-11-FEMALE",      "Age Group Championship (Junior Olympics) 11 Women"), 
-  ("FW-10-MALE",        "Far Western 10 and Under Men"),
-  ("FW-10-FEMALE",      "Far Western 10 and Under Women"),
-  ("FW-11-12-MALE",     "Far Western 11-12 Men"),
-  ("FW-11-12-FEMALE",   "Far Western 11-12 Women"),
+  ("JO-10-MALE",        "Men\u00A0\u00A0 10 & Under\u00A0\u00A0Age Group Championship (Junior Olympics) "), 
+  ("FW-10-MALE",        "Men\u00A0\u00A0 10 & Under\u00A0\u00A0Far Western"),
+  ("JO-11-MALE",        "Men\u00A0\u00A0 11 \u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0Age Group Championship (Junior Olympics)"), 
+  ("FW-11-12-MALE",     "Men\u00A0\u00A0 11-12\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0Far Western"),
+  ("JO-10-FEMALE",      "Women 10 & Under \u00A0Age Group Championship (Junior Olympics) "),
+  ("FW-10-FEMALE",      "Women 10 & Under \u00A0Far Western"),
+  ("JO-11-FEMALE",      "Women 11 \u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0Age Group Championship (Junior Olympics)"), 
+  ("FW-11-12-FEMALE",   "Women 11-12 \u00A0\u00A0\u00A0\u00A0\u00A0 Far Western"),
 ]
 
 times_map = {
@@ -351,10 +351,10 @@ times_map = {
 }
 
 national_times_name_pair = [
-  ("10-MALE",       "10 & Under Boys"), 
-  ("10-FEMALE",     "10 & Under Girls"), 
-  ("11-12-MALE",    "11-12 Boys"), 
-  ("11-12-FEMALE",  "11-12 Girls"), 
+  ("10-MALE",       "Boys\u00A0 10 & Under"), 
+  ("11-12-MALE",    "Boys\u00A0 11-12"), 
+  ("10-FEMALE",     "Girls 10 & Under"), 
+  ("11-12-FEMALE",  "Girls 11-12"), 
 ]
 
 # exported from data/export.py

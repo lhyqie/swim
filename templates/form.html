@@ -48,6 +48,8 @@ Example: abby-chan,stella-canoles") }}
 <script>    
 // For Multi-select form on submit action.
 $(document).ready(function () {
+    $("#timestandard").css("font-family", "monospace");
+    $("#nationaltime").css("font-family", "monospace");
     $('.selectpicker').selectpicker();
     $('#swimmers').change(function () {
         $('#hidden_swimmers').val($('#swimmers').val());
