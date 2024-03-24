@@ -6,8 +6,6 @@
 <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.2/css/bootstrap-select.min.css">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.2/js/bootstrap-select.min.js"></script>
 </head>
 
 <h3 align="center" id="banner">One Swimmer vs All Time Standards</h3>
@@ -18,18 +16,28 @@
 <br/>
 <a href="/compare" id="goback" class="btn btn-primary btn-lg">To Multple Swimmers View</a>
 <br/><br/>
-<b>Pick one swimmer</b> &nbsp;&nbsp;
-<select name="swimmer_id" id="swimmer_id" class="selectpicker" data-width="auto" data-live-search="true">
+<!-- <select name="swimmer_id" id="swimmer_id" class="selectpicker" data-width="auto" data-live-search="true">
     <option disabled selected value> -- select a swimmer -- </option>
     {% for swimmer in predefined_swimmers: %}
     <option value="{{swimmer}}">{{swimmer}}</option>
     {% endfor %}
-</select>
+</select> -->
+<label>Pick or Enter one swimmer id &nbsp;&nbsp; <input id="swimmer_id_input" list="swimmer_id" name="swimmer_id"/></label> 
+<datalist id="swimmer_id">
+    <option disabled selected value> -- select a swimmer -- </option>
+    {% for swimmer in predefined_swimmers: %}
+    <option value="{{swimmer}}">{{swimmer}}</option>
+    {% endfor %}
+</datalist>
+<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;swimmer id is <i>FirstName</i>-<i>LastName</i>-[<i>SerialNumber</i>]<br>
+&nbsp;&nbsp;&nbsp;&nbsp;which can be found from <a href="https://swimstandards.com">swimstandards.com</a>
 <br/><br/>
 {{ form.nationaltime.label }}
 <br/><br/>
 {{ form.nationaltime(size=6) }}
 <br/><br/>
+<br><br>
 <input type="submit" name="Go" class="btn btn-info" value="Go" onclick="run()"/>
 <br/>
 <img src="{{ url_for('static',filename='loading_icon.gif') }}" id="loading" style="display: none;">
@@ -42,6 +50,7 @@ function run() {
 }
 $(document).ready(function () {
     $("#nationaltime").css("font-family", "monospace");
+    $("#swimmer_id_input").focus();
 });
 </script>
 </html>
