@@ -1,5 +1,5 @@
-# From https://www.pacswim.org/userfiles/cms/documents/809/agc-time-std.-scy-2023-2024-rev-9.18.23.pdf
-# and https://www.pacswim.org/userfiles/cms/documents/859/fw-time-std.---spring-2024-rev-8.25.23.pdf
+# From https://www.pacswim.org/userfiles/cms/documents/1233/agc-lcm-time-std.-scy-2023-2024-rev-9.18.23.pdf
+# and https://www.pacswim.org/userfiles/cms/documents/858/fw-time-std.---summer-2024-9.18.23.pdf
 times_name_pair = [
   ("JO-10-MALE",        "Men\u00A0\u00A0 10 & Under\u00A0\u00A0Age Group Championship"), 
   ("FW-10-MALE",        "Men\u00A0\u00A0 10 & Under\u00A0\u00A0Far Western"),
@@ -49,7 +49,7 @@ times_map = {
     '100 M Breast'  : "1:42.69",
     '200 M Breast'  : "",
     '50 M Fly'      : "40.19",
-    '100 M Fly'     : "1:34.49",
+    '100 M Fly'     : "1:34.29",
     '200 M Fly'     : "",
     '200 M IM'      : "3:14.29",
     '400 M IM'      : "",
@@ -224,7 +224,7 @@ times_map = {
   },
   'FW-10-FEMALE' : {
     '25 Y Free'     : "",
-    '50 Y Free'     : "30.19",
+    '50 Y Free'     : "30.59",
     '100 Y Free'    : "1:08.09",
     '200 Y Free'    : "2:29.49",
     '500 Y Free'    : "6:25.69",
