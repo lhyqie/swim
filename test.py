@@ -1,11 +1,15 @@
 # -------------------- Test Crawler --------------------------
-# from utils import SwimStandardsCrawler
-# crawler = SwimStandardsCrawler()
+from utils import SwimStandardsCrawler, to_fastest
+crawler = SwimStandardsCrawler()
 
 # for event in crawler.crawl_fastest_time('https://swimstandards.com/swimmer/abby-chan'):
 #   print(event)
-# for event in crawler.crawl_all_events('https://swimstandards.com/swimmer/abby-chan'):
-#   print(event)
+all_events = crawler.crawl_all_events('https://swimstandards.com/swimmer/abby-chan')
+for event in all_events:
+  print(event)
+print('----------------------------------------------------')
+for event in to_fastest(all_events):
+  print(event)
 
 # swimmers = []
 # swimmers += crawler.crawl_swimmers('https://swimstandards.com/rankings/25fr-scy-8-male-pc_alto?target=2&u_season=2324&u_season_start=2023&u_season_end=2024&page=1')
@@ -40,14 +44,14 @@
 # event_store.swimmer_fastest_time_to_db('abby-chan', events)
 
 # -------------------- Test ScoreBoard --------------------------
-from utils import ScoreBoard
-sb = ScoreBoard(time_standard='JO-10-MALE', national_time='10-MALE')
-sb.add_time_standards()
-sb.add_swimmer('abby-chan')
-records, rownames, colnames = sb.gen_report(format="records+nationaltime")
-print('rownames:', rownames)
-print('colnames:', colnames)
-print('records:', records)
+# from utils import ScoreBoard
+# sb = ScoreBoard(time_standard='JO-10-MALE', national_time='10-MALE')
+# sb.add_time_standards()
+# sb.add_swimmer('abby-chan')
+# records, rownames, colnames = sb.gen_report(format="records+nationaltime")
+# print('rownames:', rownames)
+# print('colnames:', colnames)
+# print('records:', records)
 
 # records, rownames, colnames = sb.gen_report(format="records")
 # print('rownames:', rownames)

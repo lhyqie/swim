@@ -6,6 +6,7 @@ from datetime import datetime
 from datetime import timedelta
 from flask import session
 from times import national_timemap,times_map,times_name_pair
+from typing import List
 
 
 class Event:
@@ -26,12 +27,12 @@ class Event:
 
 
 class FastestEvent:
-  def __init__(self):
-    self.event_name = ''
-    self.time = ''
-    self.age = ''
-    self.swim_meet = ''
-    self.date = ''
+  def __init__(self, event_name='', time=''):
+    self.event_name = event_name
+    self.time = time
+    # self.age = ''
+    # self.swim_meet = ''
+    # self.date = ''
 
   def __str__(self):
     # return f'{self.event_name:12s} ({self.age}) | {self.time:7s} | {self.date} | {self.swim_meet}'
@@ -63,6 +64,106 @@ def national_time_standard(event:str, timestr:str, national_timemap) -> str:
     return res
 
 
+def to_fastest(events: List[Event]) -> List[FastestEvent]:
+  from collections import defaultdict
+  from functools import cmp_to_key
+  def compare_time(time1: str, time2: str) -> int:
+      if time1 == '' or time2 == '': return False
+      try:
+        timeint1 = int(time1.replace(':','').replace('.',''))
+        timeint2 = int(time2.replace(':','').replace('.',''))
+      except ValueError:
+        return False
+      return timeint1 - timeint2
+  
+  def compare_event_name(e1: FastestEvent, e2: FastestEvent) -> int:
+    # find the first non-numeric character
+    p = 0
+    en1 = e1.event_name
+    en2 = e2.event_name
+    for i, ch in enumerate(en1):
+      if not ch.isnumeric():
+        p = i
+        break
+    length1 = en1[:p]
+    type1, style1 = en1[p:].split()
+    for i, ch in enumerate(en2):
+      if not ch.isnumeric():
+        p = i
+        break
+    length2 = en2[:p]
+    type2, style2 = en2[p:].split()
+    
+    if type1 != type2:
+      return ord(type2) - ord(type1) # 'Y' first, 'M' later
+    if style1 == style2:
+      return (int)(length1) - (int)(length2)
+    else:
+      orderMap = {
+        'Free' : 0,
+        'Back' : 1,
+        'Breast' : 2,
+        'Fly' : 3,
+        'IM' : 4,
+      }
+      return orderMap[style1] - orderMap[style2]
+
+  # For example: convert "100FL" + "SCY" to "100 Y Fly"
+  def convert_event_name_type(event_name, event_type) -> str:
+    # find the first non-numeric character
+    p = 0
+    for i, ch in enumerate(event_name):
+      if not ch.isnumeric():
+        p = i
+        break
+    chunk1 = event_name[:p]
+    chunk2 = event_name[p:]
+    nameMap = {
+      'FR': 'Free',
+      'FL': 'Fly',
+      'IM': 'IM',
+      'BK': 'Back',
+      'BR': 'Breast'
+    }
+    typeMap = {
+      'SCY' : 'Y',
+      'LCM' : 'M',
+    }
+    if chunk1 == "400500" and event_type == "SCY":
+      chunk1 = "500"
+    elif chunk1 == "400500" and event_type == "LCM":
+      chunk1 = "400"
+    elif chunk1 == "8001000" and event_type == "SCY":
+      chunk1 = "1000"
+    elif chunk1 == "8001000" and event_type == "LCM":
+      chunk1 = "800"
+    elif chunk1 == "15001650" and event_type == "SCY":
+      chunk1 = "1650"
+    elif chunk1 == "15001650" and event_type == "LCM":
+      chunk1 = "1500"
+    elif int(chunk1) > 400:
+      print(chunk1)
+      raise Exception(f"unknown event name {chunk1} for {event_type}")
+
+    return f"{chunk1} {typeMap[event_type]} {nameMap[chunk2]}"
+    
+  e2t = defaultdict(list)
+  for event in events:
+    # remove time that is invalid: "00.00"
+    if event.time == "00.00":
+      continue
+    try:
+      e2t[convert_event_name_type(event.event_name, event.type)].append(event.time)
+    except Exception:
+      print(event)
+    
+  fastest_events = []
+  for event_name, events in e2t.items():
+    events.sort(key=cmp_to_key(compare_time))
+    fastest_events.append(FastestEvent(event_name, events[0]))
+  fastest_events.sort(key=cmp_to_key(compare_event_name))
+  return fastest_events
+
 class SwimStandardsCrawler:
   def __init__(self):
     pass
@@ -73,7 +174,6 @@ class SwimStandardsCrawler:
     soup = BeautifulSoup(response.content, 'html.parser')
     jobj = json.loads(soup.select('script')[-1].string)
     data = jobj['props']['pageProps']['swimmer']['records']['data']
-
     events = []
     for elem in data:
       event = Event(elem)
@@ -157,7 +257,12 @@ class EventStore:
           event.time = tokens[1].strip()
           events.append(event)
         return events
-    events = self.crawler.crawl_fastest_time('https://swimstandards.com/swimmer/' + swimmer_id)
+
+    # events = self.crawler.crawl_fastest_time('https://swimstandards.com/swimmer/' + swimmer_id)
+    try:
+      events = to_fastest(self.crawler.crawl_all_events('https://swimstandards.com/swimmer/' + swimmer_id))
+    except KeyError:
+      return []
     # use live fetched stats to database.
     self.swimmer_fastest_time_to_db(swimmer_id, events)
     return events
