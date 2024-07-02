@@ -122,10 +122,10 @@ input:checked + .slider:before {
 
 <div id="table-container" class="table-container">
 <table border="1" id="swimmers">
-  <thead>
-      <tr>
-          <th></th>
-          {% for i in range(colnames | length): %}
+    <thead>
+        <tr>
+            <th></th>
+            {% for i in range(colnames | length): %}
             {% if i == 0 %}
             <th>
               <a href="https://swimstandards.com/swimmer/{{colnames[i]}}">
@@ -145,10 +145,10 @@ input:checked + .slider:before {
               {% endif %}
             </th>
             {% endif %}
-          {% endfor %}
-      </tr>
-  </thead>
-  <tbody>
+            {% endfor %}
+        </tr>
+    </thead>
+    <tbody>
       {% for i in range(records | length): %}
       <tr>
           <td> {{ rownames[i] }} </td>
@@ -173,7 +173,7 @@ input:checked + .slider:before {
           {% endfor %}
       </tr>
       {% endfor %}
-  </tbody>
+    </tbody>
 </table>
 </div>
 

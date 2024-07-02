@@ -124,9 +124,9 @@ input:checked + .slider:before {
 <div id="table-container" class="table-container">
 <table border="1" id="swimmers">
     <thead>
-      <tr>
-          <th></th>
-          {% for i in range(colnames | length): %}
+        <tr>
+            <th></th>
+            {% for i in range(colnames | length): %}
             {% if i == 0 %}
             <th>
                 {% if colnames[i].startswith('JO')%}
@@ -145,14 +145,14 @@ input:checked + .slider:before {
                 {{ colnames[i] }}</a>
             </th>
             {% endif %}
-          {% endfor %}
-      </tr>
-  </thead>
-  <tbody>
-      {% for i in range(records | length): %}
-      <tr>
-          <td> {{ rownames[i] }} </td>
-          {% for j in range(colnames | length): %}
+            {% endfor %}
+        </tr>
+    </thead>
+    <tbody>
+        {% for i in range(records | length): %}
+        <tr>
+            <td> {{ rownames[i] }} </td>
+            {% for j in range(colnames | length): %}
             {% if j == 0 %}
                 <td class="standards"> {{ records[i][colnames[j]] }}  </td>
             {% elif j > 0 and compare_time(records[i][colnames[j]], records[i][colnames[0]]) %}
@@ -171,10 +171,10 @@ input:checked + .slider:before {
             {% else %}
                 <td> {{ records[i][colnames[j]] }} </td>
             {% endif %}            
-          {% endfor %}
-      </tr>
-      {% endfor %}
-  </tbody>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </tbody>
 </table>
 </div>
 

@@ -86,7 +86,7 @@ select.selectpicker { width: 30em }
 /* table-container is to freeze the table header */
 .table-container {
   overflow-y: auto;
-  height: 800px; /* Adjust this value based on your requirement */
+  height: 1200px; /* Adjust this value based on your requirement */
 }
 
 .table-container th {
