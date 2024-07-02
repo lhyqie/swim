@@ -120,9 +120,10 @@ input:checked + .slider:before {
     <input id="headroom" type="checkbox" onclick="toggle_headroom_column()"/>
     <span class="slider round"></span>
 </label>&nbsp;&nbsp;Headroom
-  
+
+<div id="table-container" class="table-container">
 <table border="1" id="swimmers">
-  <thead>
+    <thead>
       <tr>
           <th></th>
           {% for i in range(colnames | length): %}
@@ -175,6 +176,7 @@ input:checked + .slider:before {
       {% endfor %}
   </tbody>
 </table>
+</div>
 
 <script>
 function apply_filter() {

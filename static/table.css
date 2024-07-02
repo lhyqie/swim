@@ -82,3 +82,16 @@ select.selectpicker { width: 30em }
     font-size: 20px;
   }
 }
+
+/* table-container is to freeze the table header */
+.table-container {
+  overflow-y: auto;
+  height: 800px; /* Adjust this value based on your requirement */
+}
+
+.table-container th {
+  position: sticky;
+  top: 0;
+  background-color: #fff; /* Prevents header from becoming transparent */
+  z-index: 100; /* Ensures the header stays on top of other content */
+}
