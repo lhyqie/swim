@@ -117,17 +117,18 @@ input:checked + .slider:before {
 &nbsp;&nbsp;&nbsp;&nbsp;
 
 <label class="switch">
-    <input id="headroom" type="checkbox" onclick="toggle_headroom_column()"/>
-    <span class="slider round"></span>
-</label>&nbsp;&nbsp;Headroom
+<input id="headroom" type="checkbox" onclick="toggle_headroom_column()"/>
+<span class="slider round"></span>
+</label>
+<label class="form-check-label" for="headroom">Headroom</label>
 <br>
 
 <div style="margin-left: 30px;">
 <input class="form-check-input" type="checkbox" id="gender-male" onclick="toggle_gender('#gender-male', '-MALE')" checked>
-<label class="form-check-label" for="flexCheckChecked">Show Male</label>
+<label class="form-check-label" for="gender-male">Male Time Standards</label>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 <input class="form-check-input" type="checkbox" id="gender-female" onclick="toggle_gender('#gender-female', '-FEMALE')" checked>
-<label class="form-check-label" for="flexCheckChecked">Show Female</label>
+<label class="form-check-label" for="gender-female">Female Time Standards</label>
 </div>
 
 <div id="table-container" class="table-container">

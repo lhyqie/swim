@@ -44,50 +44,11 @@
 
 select.selectpicker { width: 30em }
 
-@media (min-width:320px)  { 
-  /* smartphones, portrait iPhone, portrait 480x320 phones (Android) */ 
-  #banner {
-    font-size: 50px;
-  }
-  * {
-    font-size: 30px;
-  }
-  input.btn {
-    font-size: 30px;
-  }
-}
-
-@media (min-width:480px)  { 
-  /* smartphones, Android phones, landscape iPhone */ 
-  #banner {
-    font-size: 50px;
-  }
-  * {
-    font-size: 30px;
-  }
-  input.btn {
-    font-size: 30px;
-  }
-}
-
-@media (min-width:1025px) { 
-  /* big landscape tablets, laptops, and desktops */ 
-  #banner {
-    font-size: 30px;
-  }
-  * {
-    font-size: 20px;
-  }
-  input.btn {
-    font-size: 20px;
-  }
-}
-
 /* table-container is to freeze the table header */
 .table-container {
   overflow-y: auto;
   overflow-x: auto;
-  height: 1200px; /* Adjust this value based on your requirement */
+  height: 1500px; /* Adjust this value based on your requirement */
 }
 
 .table-container th {
@@ -112,4 +73,64 @@ input#gender-male{
 input#gender-female{
   width: 20px;
   height: 20px;
+}
+
+@media (min-width:320px)  { 
+  /* smartphones, portrait iPhone, portrait 480x320 phones (Android) */ 
+  #banner {
+    font-size: 50px;
+  }
+  * {
+    font-size: 30px;
+  }
+  input.btn {
+    font-size: 30px;
+  }
+}
+
+@media (min-width:480px)  { 
+  /* smartphones, Android phones, landscape iPhone */ 
+  #banner {
+    font-size: 50px;
+  }
+  * {
+    font-size: 30px;
+  }
+  input.btn {
+    font-size: 30px;
+  }
+  input#gender-male{
+    width: 25px;
+    height: 25px;
+  }
+  input#gender-female{
+    width: 25px;
+    height: 25px;
+  }
+}
+
+@media (min-width:1025px) { 
+  /* big landscape tablets, laptops, and desktops */ 
+  #banner {
+    font-size: 30px;
+  }
+  * {
+    font-size: 20px;
+  }
+  input.btn {
+    font-size: 20px;
+  }
+  input#gender-male{
+    width: 20px;
+    height: 20px;
+  }
+  input#gender-female{
+    width: 20px;
+    height: 20px;
+  }
+  .table-container {
+    overflow-y: auto;
+    overflow-x: auto;
+    height: 1000px; /* Adjust this value based on your requirement */
+  }
 }
