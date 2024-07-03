@@ -86,6 +86,7 @@ select.selectpicker { width: 30em }
 /* table-container is to freeze the table header */
 .table-container {
   overflow-y: auto;
+  overflow-x: auto;
   height: 1200px; /* Adjust this value based on your requirement */
 }
 
@@ -94,4 +95,21 @@ select.selectpicker { width: 30em }
   top: 0;
   background-color: #fff; /* Prevents header from becoming transparent */
   z-index: 100; /* Ensures the header stays on top of other content */
+}
+
+.table-container tr>th:first-child,tr>td:first-child {
+  position: sticky;
+  left: 0;
+  background: #ebfa9f;
+  z-index: 200;
+}
+
+input#gender-male{
+  width: 20px;
+  height: 20px;
+}
+
+input#gender-female{
+  width: 20px;
+  height: 20px;
 }

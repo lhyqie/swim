@@ -114,11 +114,21 @@ input:checked + .slider:before {
 &nbsp;&nbsp;<a id="url_text" href=""></a>
 <br/><br/>
 <input type="text" id="event_filter" onkeyup="apply_filter()" placeholder="Search for Event Name.." size="30">
-<br/><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;
+
 <label class="switch">
     <input id="headroom" type="checkbox" onclick="toggle_headroom_column()"/>
     <span class="slider round"></span>
 </label>&nbsp;&nbsp;Headroom
+<br>
+
+<div style="margin-left: 30px;">
+<input class="form-check-input" type="checkbox" id="gender-male" onclick="toggle_gender('#gender-male', '-MALE')" checked>
+<label class="form-check-label" for="flexCheckChecked">Show Male</label>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<input class="form-check-input" type="checkbox" id="gender-female" onclick="toggle_gender('#gender-female', '-FEMALE')" checked>
+<label class="form-check-label" for="flexCheckChecked">Show Female</label>
+</div>
 
 <div id="table-container" class="table-container">
 <table border="1" id="swimmers">
@@ -231,6 +241,7 @@ function toggle_headroom_column() {
         document.querySelectorAll('#swimmers tr').forEach((row, i) => {
             const cols = row.children.length;
             for (let j = cols - 1 ; j >= 3; j-=1) {
+                if (row.children[j].style.display == "none") continue;
                 const span = document.createElement("span");
                 if ( i == 0) {
                     span.innerHTML = "Δ";
@@ -256,6 +267,27 @@ function toggle_headroom_column() {
             }
         });
     }
+}
+
+function toggle_gender(checkbox_id, gender_substr) {
+    document.querySelector('#headroom').checked = false;
+    toggle_headroom_column();
+    const buttonChecked = document.querySelector(checkbox_id).checked;
+    var hidden_indices = [];
+    row = document.querySelectorAll('#swimmers tr')[0]
+    for (let j = 0 ; j < row.children.length; j++) {
+        if (row.children[j].innerHTML.includes(gender_substr)) {
+            hidden_indices.push(j);
+        }
+    }
+
+    var display = buttonChecked ? "" : "None";
+    document.querySelectorAll('#swimmers tr').forEach((row, i) => {
+        const cols = row.children.length;
+        hidden_indices.forEach(idx => {
+            row.children[idx].style.display = display;
+        });
+    });
 }
 
 function toSeconds(timestr) {
