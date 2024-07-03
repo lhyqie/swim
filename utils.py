@@ -239,7 +239,7 @@ class EventStore:
   def __init__(self, sqldb_file):
     self.crawler = SwimStandardsCrawler()
     self.sqldb_file = sqldb_file
-    self.db_cache_expiry = timedelta(days=3)
+    self.db_cache_expiry = timedelta(hours=6)
     self.event_delim = '|'
     self.event_time_delim = '-'
 
