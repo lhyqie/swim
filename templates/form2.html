@@ -33,14 +33,16 @@
 &nbsp;&nbsp;&nbsp;&nbsp;swimmer id is <i>FirstName</i>-<i>LastName</i>[-<i>SerialNumber</i>]<br>
 &nbsp;&nbsp;&nbsp;&nbsp;which can be found from <a href="https://swimstandards.com">swimstandards.com</a>
 <br/><br/>
+<!--
 {{ form.nationaltime.label }}
 <br/><br/>
 {{ form.nationaltime(size=6) }}
 <br/><br/>
 <br><br>
+--!>
 <input type="submit" name="Go" class="btn btn-info" value="Go" onclick="run()"/>
 <br/>
-<img src="{{ url_for('static',filename='loading_icon.gif') }}" id="loading" style="display: none;">
+<!-- <img src="{{ url_for('static',filename='loading_icon.gif') }}" id="loading" style="display: none;"> -->
 </form>
 </div>
 

@@ -123,6 +123,7 @@ input:checked + .slider:before {
 <label class="form-check-label" for="headroom">Headroom</label>
 <br>
 
+<!-- 
 <label class="form-check-label">By Gender</label>&nbsp;&nbsp;&nbsp;&nbsp;
 <select id="gender" class="form-select" onchange="toggle_gender_season();">
     <option value="both" selected>Both</option>
@@ -130,14 +131,15 @@ input:checked + .slider:before {
     <option value="female">Female</option>
 </select>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+-->
+
 <label class="form-check-label">By Season</label>&nbsp;&nbsp;&nbsp;&nbsp;
 <select id="season" class="form-select" onchange="toggle_gender_season();">
     <option value="both" selected>Both</option>
     <option value="scy">SCY</option>
     <option value="lcm">LCM</option>
 </select>
-<br>    
-
+<br>
 <div id="table-container" class="table-container">
 <table border="1" id="swimmers">
     <thead>
@@ -203,15 +205,15 @@ function apply_filter() {
     table = document.getElementById("swimmers");
     tr = table.getElementsByTagName("tr");
     for (i = 0; i < tr.length; i++) {
-    td = tr[i].getElementsByTagName("td")[0];
-    if (td) {
-        txtValue = td.textContent || td.innerText;
-        if (txtValue.toUpperCase().indexOf(filter) > -1) {
-        tr[i].style.display = "";
-        } else {
-        tr[i].style.display = "none";
-        }
-    }       
+        td = tr[i].getElementsByTagName("td")[0];
+        if (td) {
+            txtValue = td.textContent || td.innerText;
+            if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                tr[i].style.display = "";
+            } else {
+                tr[i].style.display = "none";
+            }
+        }       
     }
 }
 function copy_url() {
@@ -283,6 +285,7 @@ function toggle_gender_season() {
     toggle_headroom_column();
 
     // Filter columns by gender.
+    /*
     var gender = document.getElementById("gender").value;
     var exclude_gender_substr = "#";
     if (gender == "male") {
@@ -292,7 +295,6 @@ function toggle_gender_season() {
     } else {
         // gender is "both"
     }
-
     var hidden_indices = [];
     if (gender != "both") {
         row = document.querySelectorAll('#swimmers tr')[0]
@@ -313,6 +315,7 @@ function toggle_gender_season() {
             row.children[j].style.display = display;
         }
     });
+    */
 
     // Filter rows by season.
     var season = document.getElementById("season").value;
@@ -330,6 +333,10 @@ function toggle_gender_season() {
             // Check if event name matches regex excluding header row.
             for (let j = 0 ; j < row.children.length; j++) {
                 row.children[j].style.display = "none";
+            }
+        } else {
+            for (let j = 0 ; j < row.children.length; j++) {
+                row.children[j].style.display = "";
             }
         }
     });

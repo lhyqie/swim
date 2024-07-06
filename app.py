@@ -103,11 +103,11 @@ def card():
 
   nationaltime = request.args.get('nt') or session.get('nt') or ''
   logging.debug(f'swimmer={swimmer}')
+  logging.debug(f'nationaltime={nationaltime}')
   sc = ScoreCard(swimmer, nationaltime)
   records, rownames, colnames = sc.gen_report()
-  logging.debug(f'records size={len(records)}, rownames size={len(rownames)}, colnames size={len(colnames)}')
-
-  return render_template('card.html', nationaltime=nationaltime, national_timemap=national_timemap,
+  logging.debug(f'records size={len(records)}, rownames size={len(rownames)}, colnames size={len(colnames)}')  
+  return render_template('card.html', nationaltime=sc.national_time, national_timemap=national_timemap,
                          records=records, rownames=rownames, colnames=colnames, form=form)
 
 
@@ -118,7 +118,7 @@ class ScoreBoardForm(FlaskForm):
 
 
 class ScoreCardForm(FlaskForm):
-  nationaltime = SelectField('National Age Group Motivational Time', choices=national_times_name_pair, default="10-MALE")
+  nationaltime = SelectField('National Age Group Motivational Time', choices=national_times_name_pair)
 
 
 @app.route('/compare/', methods=('GET', 'POST'))

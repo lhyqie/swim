@@ -4,7 +4,8 @@ crawler = SwimStandardsCrawler()
 
 # for event in crawler.crawl_fastest_time('https://swimstandards.com/swimmer/abby-chan'):
 #   print(event)
-all_events = crawler.crawl_all_events('https://swimstandards.com/swimmer/abby-chan')
+all_events, gender, age = crawler.crawl_all_events('https://swimstandards.com/swimmer/abby-chan')
+print('gender is:', gender, ' age is: ', age)
 for event in all_events:
   print(event)
 print('----------------------------------------------------')

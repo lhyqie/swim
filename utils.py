@@ -173,12 +173,14 @@ class SwimStandardsCrawler:
     response = requests.get(url)
     soup = BeautifulSoup(response.content, 'html.parser')
     jobj = json.loads(soup.select('script')[-1].string)
-    data = jobj['props']['pageProps']['swimmer']['records']['data']
+    swimmer_data = jobj['props']['pageProps']['swimmer']
+    gender = swimmer_data['sex']
+    age = swimmer_data['age']
     events = []
-    for elem in data:
+    for elem in swimmer_data['records']['data']:
       event = Event(elem)
       events.append(event)
-    return events
+    return events, gender, age
 
   # for example swimmer url: https://swimstandards.com/swimmer/abby-chan
   def crawl_fastest_time(self, url):
@@ -244,8 +246,9 @@ class EventStore:
     self.event_time_delim = '-'
 
   def swimmer_fastest_time(self, swimmer_id, use_cache=True):
+    gender = 'Male'
+    age = '10'
     from_db = self.swimmer_fastest_time_from_db(swimmer_id)
-    
     if use_cache and len(from_db) > 0: 
       cache_datetime = datetime.strptime(from_db[0]['crawl_date'], '%Y-%m-%d %H:%M:%S')
       if (datetime.now() - cache_datetime) < self.db_cache_expiry:
@@ -256,16 +259,17 @@ class EventStore:
           event.event_name = tokens[0].strip()
           event.time = tokens[1].strip()
           events.append(event)
-        return events
+        return events, gender, age
 
     # events = self.crawler.crawl_fastest_time('https://swimstandards.com/swimmer/' + swimmer_id)
     try:
-      events = to_fastest(self.crawler.crawl_all_events('https://swimstandards.com/swimmer/' + swimmer_id))
+      events, gender, age = self.crawler.crawl_all_events('https://swimstandards.com/swimmer/' + swimmer_id)
+      events = to_fastest(events)
     except KeyError:
       return []
     # use live fetched stats to database.
     self.swimmer_fastest_time_to_db(swimmer_id, events)
-    return events
+    return events, gender, age
 
   def swimmer_fastest_time_from_db(self, swimmer_id):
     conn = self._get_db_connection()
@@ -303,7 +307,7 @@ class ScoreBoard:
 
   def add_swimmer(self, swimmer_id):
     column = {}
-    events = self.event_store.swimmer_fastest_time(swimmer_id, use_cache=True)
+    events, gender, age = self.event_store.swimmer_fastest_time(swimmer_id, use_cache=False)
     for event in events:
       column[event.event_name] = event.time
     self.board.append(column)
@@ -365,26 +369,40 @@ class ScoreCard:
     self.swimmers = []
     self.national_time = nationaltime
     self.event_store = EventStore('swimmers.db')
+    self.gender = 'Male'
+    self.age = '10'
     # the first column is swimmmer, the next columns are time standards.
     self._add_swimmer_to_board()    
     self._add_all_time_standards_to_board()
-    
+
   def _add_swimmer_to_board(self):
     if not self.swimmer: return
     self.swimmers.append(self.swimmer)
     column = {}
-    events = self.event_store.swimmer_fastest_time(self.swimmer, use_cache=True)
+    events, gender, age = self.event_store.swimmer_fastest_time(self.swimmer, use_cache=False)
+    self.gender = gender
+    self.age = age
     for event in events:
       column[event.event_name] = event.time
     self.board.append(column)
 
   def _add_all_time_standards_to_board(self):
+    # filter times by gender
     for times_name, _ in times_name_pair:
-      self.board.append(times_map[times_name])
-      self.swimmers.append(times_name)
+      if times_name.endswith(f'-{self.gender.upper()}'):
+        self.board.append(times_map[times_name])
+        self.swimmers.append(times_name)
 
   def gen_report(self):
     if not self.swimmer: return [], [], []
+    # if national time not specified, infer it from swimmer's age and gender.
+    if self.national_time == '':
+      if self.age < 10:
+        self.national_time += "10-" + self.gender.upper()
+      elif 11<= self.age <= 12:
+        self.national_time += "11-12-" + self.gender.upper()
+      else:
+        self.national_time = '10-MALE'
     rownames = [k for k, _ in self.board[1].items()]
     colnames = []
     for i, swimmer in enumerate(self.swimmers):
