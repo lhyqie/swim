@@ -116,17 +116,17 @@ input:checked + .slider:before {
 <br/><br/>
 <input type="text" id="event_filter" onkeyup="apply_filter()" placeholder="Search for Event Name.." size="30">
 <br/><br/>
-<label class="switch">
+<!-- <label class="switch">
     <input id="headroom" type="checkbox" onclick="toggle_headroom_column()"/>
     <span class="slider round"></span>
-</label>&nbsp;&nbsp;Headroom
+</label>&nbsp;&nbsp;Headroom -->
 
 <label class="form-check-label">By Season</label>&nbsp;&nbsp;&nbsp;&nbsp;
 <select id="season" class="form-select" onchange="toggle_season();">
+    <option value="scy">SCY</option>
     <option value="lcm">LCM</option>
-    <option value="both">Both</option>
 </select>
-<br>    
+<br><br>
 
 <div id="table-container" class="table-container">
 <table border="1" id="swimmers">
