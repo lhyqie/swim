@@ -123,9 +123,8 @@ input:checked + .slider:before {
 
 <label class="form-check-label">By Season</label>&nbsp;&nbsp;&nbsp;&nbsp;
 <select id="season" class="form-select" onchange="toggle_season();">
-    <option value="both" selected>Both</option>
-    <option value="scy">SCY</option>
     <option value="lcm">LCM</option>
+    <option value="both">Both</option>
 </select>
 <br>    
 
@@ -301,7 +300,6 @@ function toggle_season() {
     } else if (season == "both") {
         season = "";
     }
-
     var re = new RegExp("^[0-9]+\\s" + season + ".*");
     document.querySelectorAll('#swimmers tr').forEach((row, i) => {
         if (!re.test(row.children[0].innerHTML.trim()) && i > 0) {
@@ -389,6 +387,16 @@ $(document).ready(function () {
             }
         });
     });
+
+    const d = new Date();
+    let month = d.getMonth();
+    // LCM season is from May to September
+    if (month >= 4 && month <=8) {
+        document.getElementById("season").value = "lcm";
+    } else {
+        document.getElementById("season").value = "scy";
+    }
+    toggle_season();
 })
 </script>
 
