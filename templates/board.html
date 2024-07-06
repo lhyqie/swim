@@ -121,6 +121,14 @@ input:checked + .slider:before {
     <span class="slider round"></span>
 </label>&nbsp;&nbsp;Headroom
 
+<label class="form-check-label">By Season</label>&nbsp;&nbsp;&nbsp;&nbsp;
+<select id="season" class="form-select" onchange="toggle_season();">
+    <option value="both" selected>Both</option>
+    <option value="scy">SCY</option>
+    <option value="lcm">LCM</option>
+</select>
+<br>    
+
 <div id="table-container" class="table-container">
 <table border="1" id="swimmers">
     <thead>
@@ -283,6 +291,32 @@ function toggle_headroom_column() {
     }
 }
 
+function toggle_season() {
+    // Filter rows by season.
+    var season = document.getElementById("season").value;
+    if (season == "scy") {
+        season = "Y";
+    } else if (season == "lcm") {
+        season = "M";
+    } else if (season == "both") {
+        season = "";
+    }
+
+    var re = new RegExp("^[0-9]+\\s" + season + ".*");
+    document.querySelectorAll('#swimmers tr').forEach((row, i) => {
+        if (!re.test(row.children[0].innerHTML.trim()) && i > 0) {
+            // Check if event name matches regex excluding header row.
+            for (let j = 0 ; j < row.children.length; j++) {
+                row.children[j].style.display = "none";
+            }
+        } else {
+            for (let j = 0 ; j < row.children.length; j++) {
+                row.children[j].style.display = "";
+            }
+        }
+    });
+}
+
 function toSeconds(timestr) {
     seconds = 0;
     tokens = timestr.split('.');
@@ -314,9 +348,9 @@ function toTimeStr(seconds) {
         timestr += "0" + Math.floor(seconds);
     }
     seconds_part = Math.round(seconds * 100 % 100);
-    console.log("minutes="+minutes)
-    console.log("seconds="+seconds)
-    console.log("seconds_part="+seconds_part)
+    // console.log("minutes="+minutes)
+    // console.log("seconds="+seconds)
+    // console.log("seconds_part="+seconds_part)
     timestr += "." + (seconds_part >= 10 ? seconds_part : "0" + seconds_part);
     return timestr;
 }

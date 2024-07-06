@@ -123,13 +123,20 @@ input:checked + .slider:before {
 <label class="form-check-label" for="headroom">Headroom</label>
 <br>
 
-<div style="margin-left: 30px;">
-<input class="form-check-input" type="checkbox" id="gender-male" onclick="toggle_gender('#gender-male', '-MALE')" checked>
-<label class="form-check-label" for="gender-male">Male Time Standards</label>
+<label class="form-check-label">By Gender</label>&nbsp;&nbsp;&nbsp;&nbsp;
+<select id="gender" class="form-select" onchange="toggle_gender_season();">
+    <option value="both" selected>Both</option>
+    <option value="male">Male</option>
+    <option value="female">Female</option>
+</select>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<input class="form-check-input" type="checkbox" id="gender-female" onclick="toggle_gender('#gender-female', '-FEMALE')" checked>
-<label class="form-check-label" for="gender-female">Female Time Standards</label>
-</div>
+<label class="form-check-label">By Season</label>&nbsp;&nbsp;&nbsp;&nbsp;
+<select id="season" class="form-select" onchange="toggle_gender_season();">
+    <option value="both" selected>Both</option>
+    <option value="scy">SCY</option>
+    <option value="lcm">LCM</option>
+</select>
+<br>    
 
 <div id="table-container" class="table-container">
 <table border="1" id="swimmers">
@@ -270,24 +277,61 @@ function toggle_headroom_column() {
     }
 }
 
-function toggle_gender(checkbox_id, gender_substr) {
+function toggle_gender_season() {
+    // hide headroom columns first.
     document.querySelector('#headroom').checked = false;
     toggle_headroom_column();
-    const buttonChecked = document.querySelector(checkbox_id).checked;
-    var hidden_indices = [];
-    row = document.querySelectorAll('#swimmers tr')[0]
-    for (let j = 0 ; j < row.children.length; j++) {
-        if (row.children[j].innerHTML.includes(gender_substr)) {
-            hidden_indices.push(j);
-        }
+
+    // Filter columns by gender.
+    var gender = document.getElementById("gender").value;
+    var exclude_gender_substr = "#";
+    if (gender == "male") {
+        exclude_gender_substr = "-FEMALE";
+    } else if (gender == "female") {
+        exclude_gender_substr = "-MALE";
+    } else {
+        // gender is "both"
     }
 
-    var display = buttonChecked ? "" : "None";
+    var hidden_indices = [];
+    if (gender != "both") {
+        row = document.querySelectorAll('#swimmers tr')[0]
+        for (let j = 0 ; j < row.children.length; j++) {
+            if (row.children[j].innerHTML.includes(exclude_gender_substr)) {
+                hidden_indices.push(j);
+            }
+        }
+    }
     document.querySelectorAll('#swimmers tr').forEach((row, i) => {
-        const cols = row.children.length;
-        hidden_indices.forEach(idx => {
-            row.children[idx].style.display = display;
-        });
+        display = "";
+        for (let j = 0 ; j < row.children.length; j++) {
+            if (hidden_indices.includes(j)) {
+                display = "none";
+            } else {
+                display = "";
+            }
+            row.children[j].style.display = display;
+        }
+    });
+
+    // Filter rows by season.
+    var season = document.getElementById("season").value;
+    if (season == "scy") {
+        season = "Y";
+    } else if (season == "lcm") {
+        season = "M";
+    } else if (season == "both") {
+        season = "";
+    }
+
+    var re = new RegExp("^[0-9]+\\s" + season + ".*");
+    document.querySelectorAll('#swimmers tr').forEach((row, i) => {
+        if (!re.test(row.children[0].innerHTML.trim()) && i > 0) {
+            // Check if event name matches regex excluding header row.
+            for (let j = 0 ; j < row.children.length; j++) {
+                row.children[j].style.display = "none";
+            }
+        }
     });
 }
 
@@ -322,9 +366,9 @@ function toTimeStr(seconds) {
         timestr += "0" + Math.floor(seconds);
     }
     seconds_part = Math.round(seconds * 100 % 100);
-    console.log("minutes="+minutes)
-    console.log("seconds="+seconds)
-    console.log("seconds_part="+seconds_part)
+    // console.log("minutes="+minutes)
+    // console.log("seconds="+seconds)
+    // console.log("seconds_part="+seconds_part)
     timestr += "." + (seconds_part >= 10 ? seconds_part : "0" + seconds_part);
     return timestr;
 }
