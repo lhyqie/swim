@@ -44,6 +44,7 @@ def utility_processor_national_time_tool_tip():
 def board(format='records+nationaltime'):
   timestandard = request.args.get('ts') or session.get('ts') or 'JO-10-MALE'
   nationaltime = request.args.get('nt') or session.get('nt') or ''
+  season = request.args.get('season') or session.get('season') or ''
   if nationaltime == '': format = 'records'
   
   logging.debug(f'request.method={request.method}')
@@ -72,6 +73,7 @@ def board(format='records+nationaltime'):
     session['ts'] = request.form.get('timestandard','JO-10-MALE')
     session['nt'] = request.form.get('nationaltime','')
     session['swimmers'] = request.form['hidden_swimmers']
+    session['season'] = request.form.get('season','')
     if len(request.form['more_swimmers']) and len(request.form['more_swimmers'].split(',')) >= 1:
        session['swimmers'] += (',' if session['swimmers'] else '') + request.form['more_swimmers']
     logging.debug(f'request.arg: {request.args}')
@@ -84,7 +86,7 @@ def board(format='records+nationaltime'):
        logging.debug('Finished. response:{response}')
        return response
 
-    return render_template('board.html', nationaltime=nationaltime, national_timemap=national_timemap,
+    return render_template('board.html', season=season, nationaltime=nationaltime, national_timemap=national_timemap,
                            records=records, rownames=rownames, colnames=colnames, form=form)
 
 
@@ -93,8 +95,11 @@ def card():
   if request.method == 'POST':
     session['swimmer'] = request.form.get('swimmer_id','')
     session['nt'] = request.form.get('nationaltime','')
+    session['season'] = request.form.get('season','')
     logging.debug(f'request.arg: {request.args}')
-    logging.debug(f"session[swimmer]:{session['swimmer']}")
+    logging.debug(f"session[swimmer]: {session['swimmer']}")
+    logging.debug(f"session[nt]: {session['nt']}")
+    logging.debug(f"session[season]: {session['season']}")
     return redirect(url_for('card', **request.args))
   
   swimmer = request.args.get('id') or session.get('swimmer')
@@ -102,12 +107,12 @@ def card():
     return redirect(url_for('form2', **request.args))
 
   nationaltime = request.args.get('nt') or session.get('nt') or ''
-  logging.debug(f'swimmer={swimmer}')
-  logging.debug(f'nationaltime={nationaltime}')
+  season = request.args.get('season') or session.get('season') or ''
+  logging.debug(f'swimmer={swimmer}  nationaltime={nationaltime}  season={season}')
   sc = ScoreCard(swimmer, nationaltime)
   records, rownames, colnames = sc.gen_report()
   logging.debug(f'records size={len(records)}, rownames size={len(rownames)}, colnames size={len(colnames)}')  
-  return render_template('card.html', nationaltime=sc.national_time, national_timemap=national_timemap,
+  return render_template('card.html', season=season, nationaltime=sc.national_time, national_timemap=national_timemap,
                          records=records, rownames=rownames, colnames=colnames, form=form)
 
 

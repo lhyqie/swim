@@ -397,7 +397,7 @@ class ScoreCard:
     if not self.swimmer: return [], [], []
     # if national time not specified, infer it from swimmer's age and gender.
     if self.national_time == '':
-      if self.age < 10:
+      if self.age <= 10:
         self.national_time += "10-" + self.gender.upper()
       elif 11<= self.age <= 12:
         self.national_time += "11-12-" + self.gender.upper()

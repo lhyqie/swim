@@ -233,6 +233,7 @@ function copy_url() {
             break;
         }
     }
+    url += "&season="+document.getElementById("season").value;
     // console.log(url);
     document.getElementById("url_text").innerHTML = url;
     document.getElementById("url_text").href = url;
@@ -415,14 +416,18 @@ $(document).ready(function () {
         });
     });
 
-    const d = new Date();
-    let month = d.getMonth();
-    // LCM season is from May to September
-    if (month >= 4 && month <=8) {
-        document.getElementById("season").value = "lcm";
-    } else {
-        document.getElementById("season").value = "scy";
+    var season = {{season | tojson | safe}};
+    if (season != "lcm" && season != "scy") {
+        const d = new Date();
+        let month = d.getMonth();
+        // LCM season is from May to September
+        if (month >= 4 && month <=8) {
+            season = "lcm";
+        } else {
+            season = "scy";
+        }
     }
+    document.getElementById("season").value = season;
     toggle_gender_season();
 })
 </script>
