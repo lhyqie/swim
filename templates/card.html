@@ -134,7 +134,7 @@ input:checked + .slider:before {
 -->
 
 <label class="form-check-label">By Season</label>&nbsp;&nbsp;&nbsp;&nbsp;
-<select id="season" class="form-select" onchange="toggle_gender_season();">
+<select id="season" class="form-select" onchange="redirect_with_season();">
     <option value="scy">SCY</option>
     <option value="lcm">LCM</option>
 </select>
@@ -216,7 +216,8 @@ function apply_filter() {
         }       
     }
 }
-function copy_url() {
+
+function gen_url() {
     var input, filter, table, tr, td, i, txtValue;
     table = document.getElementById("swimmers");
     tr = table.getElementsByTagName("tr");    
@@ -235,6 +236,11 @@ function copy_url() {
     }
     url += "&season="+document.getElementById("season").value;
     // console.log(url);
+    return url;
+}
+
+function copy_url() {
+    url = gen_url();
     document.getElementById("url_text").innerHTML = url;
     document.getElementById("url_text").href = url;
     // Copy the text inside the text field
@@ -244,6 +250,11 @@ function copy_url() {
       .catch(() => {
         alert("copy to clipboard failed");
       });
+}
+
+function redirect_with_season() {
+    url = gen_url();
+    window.location.href = url;
 }
 
 function toggle_headroom_column() {
