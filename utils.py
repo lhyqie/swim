@@ -393,7 +393,7 @@ class ScoreCard:
         self.board.append(times_map[times_name])
         self.swimmers.append(times_name)
 
-  def gen_report(self, filter_column_by_age_gender=True):    
+  def gen_report(self, filter_column_by_age_gender=True, filter_25y_by_age=True):    
     if not self.swimmer: return [], [], []
     # if national time not specified, infer it from swimmer's age and gender.
     if self.national_time == '':
@@ -404,6 +404,9 @@ class ScoreCard:
       else:
         self.national_time = '10-MALE'
     rownames = [k for k, _ in self.board[1].items()]
+    # remove 25 Y when swimmer is more than 8 year old.
+    if filter_25y_by_age and self.age > 8:
+      rownames = [rowname for rowname in rownames if not rowname.startswith('25 Y')]
     colnames = []
     for i, swimmer in enumerate(self.swimmers):
       if (i == 0 or  # real swimer id column
@@ -417,7 +420,8 @@ class ScoreCard:
       time_map = {}  # for each row (event), record the fastest time per swimmer
       for i, swimmer in enumerate(self.swimmers):
         time_map[swimmer] = self.board[i].get(rowname,'')
-        if i == 0 and self.national_time: time_map[swimmer+'@nt'] = national_time_standard(
+        if i == 0 and self.national_time: 
+          time_map[swimmer+'@nt'] = national_time_standard(
           event=rowname, timestr=time_map[swimmer], national_timemap=national_timemap[self.national_time])
         
       records.append(time_map)
