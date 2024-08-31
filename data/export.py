@@ -1,5 +1,5 @@
 # TSV files in data/ are extracted using OCR from
-# https://www.pacswim.org/userfiles/cms/documents/801/2021-2024-national-age-group-motivational-times.pdf
+# https://websitedevsa.blob.core.windows.net/sitefinity/docs/default-source/timesdocuments/time-standards/2025/2028-motivational-standards-age-group.pdf
 def load_national_times(tsv_file):
   with open(tsv_file) as f:
     lines = f.readlines()

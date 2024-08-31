@@ -137,14 +137,14 @@ input:checked + .slider:before {
             {% if i == 0 %}
             <th>
                 {% if colnames[i].startswith('JO')%}
-                    <a href="https://www.pacswim.org/userfiles/cms/documents/1233/agc-lcm-time-std.-scy-2023-2024-rev-9.18.23.pdf">{{colnames[i]}}</a>
+                    <a href="https://www.pacswim.org/userfiles/cms/documents/809/agc-time-std.-scy-2024-2025-rev-8.27.24.pdf">{{colnames[i]}}</a>
                 {% elif colnames[i].startswith('FW') %}
-                    <a href="https://www.pacswim.org/userfiles/cms/documents/858/fw-time-std.---summer-2024-9.18.23.pdf"> {{colnames[i]}} </a>
+                    <a href="https://www.pacswim.org/userfiles/cms/documents/859/fw-time-std.---spring-2025-rev-8.27.24.pdf"> {{colnames[i]}} </a>
                 {% endif %}
             </th>
             {% elif colnames[i].endswith('@nt') %} 
             <th id="{{nationaltime}}" style="text-align:center;"> 
-                <a href="https://www.pacswim.org/userfiles/cms/documents/801/2021-2024-national-age-group-motivational-times.pdf"> {{nationaltime}} 
+                <a href="https://websitedevsa.blob.core.windows.net/sitefinity/docs/default-source/timesdocuments/time-standards/2025/2028-motivational-standards-age-group.pdf"> {{nationaltime}} 
                 </a> </th>
             {% else %}
             <th>
