@@ -4,10 +4,12 @@ times_name_pair = [
   ("JO-10-MALE",        "Men\u00A0\u00A0 10 & Under\u00A0\u00A0Age Group Championship"), 
   ("FW-10-MALE",        "Men\u00A0\u00A0 10 & Under\u00A0\u00A0Far Western"),
   ("JO-11-MALE",        "Men\u00A0\u00A0 11 \u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0Age Group Championship"), 
+  ("JO-12-MALE",        "Men\u00A0\u00A0 12 \u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0Age Group Championship"), 
   ("FW-11-12-MALE",     "Men\u00A0\u00A0 11-12\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0Far Western"),
   ("JO-10-FEMALE",      "Women 10 & Under \u00A0Age Group Championship"),
   ("FW-10-FEMALE",      "Women 10 & Under \u00A0Far Western"),
   ("JO-11-FEMALE",      "Women 11 \u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0Age Group Championship"), 
+  ("JO-12-FEMALE",      "Women 12 \u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0\u00A0Age Group Championship"), 
   ("FW-11-12-FEMALE",   "Women 11-12 \u00A0\u00A0\u00A0\u00A0\u00A0 Far Western"),
 ]
 
@@ -179,6 +181,90 @@ times_map = {
     '200 M Fly'     : "3:10.69",
     '200 M IM'      : "3:04.39",
     '400 M IM'      : "6:34.19",
+  },
+  'JO-12-MALE' : {
+    '25 Y Free'     : "",
+    '50 Y Free'     : "27.19",
+    '100 Y Free'    : "59.29",
+    '200 Y Free'    : "2:09.19",
+    '500 Y Free'    : "5:47.49",
+    '1000 Y Free'   : "11:56.79",
+    '1650 Y Free'   : "20:00.79",
+    '25 Y Back'     : "",
+    '50 Y Back'     : "31.59",
+    '100 Y Back'    : "1:07.49",
+    '200 Y Back'    : "2:27.39",
+    '25 Y Breast'   : "",
+    '50 Y Breast'   : "35.19",
+    '100 Y Breast'  : "1:15.89",
+    '200 Y Breast'  : "2:46.39",
+    '25 Y Fly'      : "",
+    '50 Y Fly'      : "30.19",
+    '100 Y Fly'     : "1:07.09",
+    '200 Y Fly'     : "2:28.39",
+    '100 Y IM'      : "1:08.09",
+    '200 Y IM'      : "2:27.09",
+    '400 Y IM'      : "5:12.19",
+
+    '50 M Free'     : "31.19",
+    '100 M Free'    : "1:07.49",
+    '200 M Free'    : "2:26.99",
+    '400 M Free'    : "5:08.49",
+    '800 M Free'    : "10:51.99",
+    '1500 M Free'   : "20:45.89",
+    '50 M Back'     : "36.49",
+    '100 M Back'    : "1:18.49",
+    '200 M Back'    : "2:45.99",
+    '50 M Breast'   : "40.09",
+    '100 M Breast'  : "1:27.69",
+    '200 M Breast'  : "3:08.89",
+    '50 M Fly'      : "34.09",
+    '100 M Fly'     : "1:16.39",
+    '200 M Fly'     : "2:48.79",
+    '200 M IM'      : "2:48.19",
+    '400 M IM'      : "5:53.39",
+  },
+  'JO-12-FEMALE' : {
+    '25 Y Free'     : "",
+    '50 Y Free'     : "27.89",
+    '100 Y Free'    : "1:00.49",
+    '200 Y Free'    : "2:12.09",
+    '500 Y Free'    : "5:51.39",
+    '1000 Y Free'   : "12:09.49",
+    '1650 Y Free'   : "20:27.19",
+    '25 Y Back'     : "",
+    '50 Y Back'     : "31.99",
+    '100 Y Back'    : "1:09.39",
+    '200 Y Back'    : "2:30.89",
+    '25 Y Breast'   : "",
+    '50 Y Breast'   : "36.09",
+    '100 Y Breast'  : "1:18.19",
+    '200 Y Breast'  : "2:52.19",
+    '25 Y Fly'      : "",
+    '50 Y Fly'      : "30.59",
+    '100 Y Fly'     : "1:08.09",
+    '200 Y Fly'     : "2:34.29",
+    '100 Y IM'      : "1:09.29",
+    '200 Y IM'      : "2:28.39",
+    '400 Y IM'      : "5:19.19",
+
+    '50 M Free'     : "31.89",
+    '100 M Free'    : "1:09.49",
+    '200 M Free'    : "2:30.29",
+    '400 M Free'    : "5:15.39",
+    '800 M Free'    : "11:03.39",
+    '1500 M Free'   : "21:13.19",
+    '50 M Back'     : "36.89",
+    '100 M Back'    : "1:19.29",
+    '200 M Back'    : "2:49.89",
+    '50 M Breast'   : "40.69",
+    '100 M Breast'  : "1:29.69",
+    '200 M Breast'  : "3:15.19",
+    '50 M Fly'      : "34.29",
+    '100 M Fly'     : "1:17.99",
+    '200 M Fly'     : "2:55.09",
+    '200 M IM'      : "2:51.19",
+    '400 M IM'      : "6:04.59",
   },
   'FW-10-MALE' : {
     '25 Y Free'     : "",
@@ -356,6 +442,32 @@ national_times_name_pair = [
   ("10-FEMALE",     "Girls 10 & Under"), 
   ("11-12-FEMALE",  "Girls 11-12"), 
 ]
+
+def time_name_fits_age_gender(time_name, age, gender):
+  if int(age) > 12:   # Do not support timestandards for over 12 yet.
+    return True
+  age = '10U' if age <= 10 else str(age)
+  ageGender2TimeStandardAllowList = {
+    ('10U', 'Male'): [
+      'JO-10-MALE', 'FW-10-MALE', 'JO-11-MALE', 'JO-12-MALE','FW-11-12-MALE'
+    ],
+    ('10U', 'Female'): [
+      'JO-10-FEMALE', 'FW-10-FEMALE', 'JO-11-FEMALE', 'JO-12-FEMALE','FW-11-12-FEMALE'
+    ],
+    ('11', 'Male'): [
+      'JO-11-MALE', 'JO-12-MALE', 'FW-11-12-MALE'
+    ],
+    ('11', 'Female'): [
+      'JO-11-FEMALE', 'JO-12-FEMALE', 'FW-11-12-FEMALE'
+    ],
+    ('12', 'Male'): [
+      'JO-12-MALE', 'FW-11-12-MALE'
+    ],
+    ('12', 'Female'): [
+      'JO-12-FEMALE', 'FW-11-12-FEMALE'
+    ],
+  }
+  return time_name in ageGender2TimeStandardAllowList[(age, gender)]  
 
 # exported from data/export.py
 # using data from https://websitedevsa.blob.core.windows.net/sitefinity/docs/default-source/timesdocuments/time-standards/2025/2028-motivational-standards-age-group.pdf

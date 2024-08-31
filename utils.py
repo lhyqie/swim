@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup
 from datetime import datetime
 from datetime import timedelta
 from flask import session
-from times import national_timemap,times_map,times_name_pair
+from times import national_timemap,times_map,times_name_pair,time_name_fits_age_gender
 from typing import List
 
 
@@ -393,34 +393,7 @@ class ScoreCard:
         self.board.append(times_map[times_name])
         self.swimmers.append(times_name)
 
-  def gen_report(self, filter_column_by_age_gender=True):
-    
-    def time_name_fits_age_gender(time_name, age, gender):
-      if int(age) > 12:  # Do not support timestandards for over 12 yet.
-        return True
-      age = '10U' if age <= 10 else str(age)
-      age2TimeStandardAllowList = {
-        ('10U', 'Male'): [
-          'JO-10-MALE', 'FW-10-MALE', 'JO-11-MALE', 'FW-11-12-MALE'
-        ],
-        ('10U', 'Female'): [
-          'JO-10-FEMALE', 'FW-10-FEMALE', 'JO-11-FEMALE', 'FW-11-12-FEMALE'
-        ],
-        ('11', 'Male'): [
-          'JO-11-MALE', 'FW-11-12-MALE'
-        ],
-        ('11', 'Female'): [
-          'JO-11-FEMALE', 'FW-11-12-FEMALE'
-        ],
-        ('12', 'Male'): [
-          'FW-11-12-MALE'
-        ],
-        ('12', 'Female'): [
-          'FW-11-12-FEMALE'
-        ],
-      }
-      return time_name in age2TimeStandardAllowList[(age, gender)]  
-      
+  def gen_report(self, filter_column_by_age_gender=True):    
     if not self.swimmer: return [], [], []
     # if national time not specified, infer it from swimmer's age and gender.
     if self.national_time == '':
@@ -434,8 +407,8 @@ class ScoreCard:
     colnames = []
     for i, swimmer in enumerate(self.swimmers):
       if (i == 0 or  # real swimer id column
-        not filter_column_by_age_gender or 
-        time_name_fits_age_gender(time_name=swimmer, age=self.age, gender=self.gender)
+          not filter_column_by_age_gender or 
+          time_name_fits_age_gender(time_name=swimmer, age=self.age, gender=self.gender)
       ):
         colnames.append(swimmer)
       if i == 0: colnames.append(swimmer+'@nt')
