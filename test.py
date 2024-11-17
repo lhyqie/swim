@@ -12,20 +12,6 @@ print('----------------------------------------------------')
 for event in to_fastest(all_events):
   print(event)
 
-# swimmers = []
-# swimmers += crawler.crawl_swimmers('https://swimstandards.com/rankings/25fr-scy-8-male-pc_alto?target=2&u_season=2324&u_season_start=2023&u_season_end=2024&page=1')
-# swimmers += crawler.crawl_swimmers('https://swimstandards.com/rankings/50fr-scy-9-10-male-pc_alto?target=12&u_season=2324&u_season_start=2023&u_season_end=2024&page=1')
-# swimmers += crawler.crawl_swimmers('https://swimstandards.com/rankings/50fr-scy-9-10-male-pc_alto?target=12&u_season=2324&u_season_start=2023&u_season_end=2024&page=2')
-# swimmers += crawler.crawl_swimmers('https://swimstandards.com/rankings/50fr-scy-11-12-male-pc_alto?target=5&u_season=2324&u_season_start=2023&u_season_end=2024&page=1')
-# swimmers += crawler.crawl_swimmers('https://swimstandards.com/rankings/50fr-scy-11-12-male-pc_alto?target=5&u_season=2324&u_season_start=2023&u_season_end=2024&page=2')
-# swimmers += crawler.crawl_swimmers('https://swimstandards.com/rankings/25fr-scy-8-female-pc_alto?target=2&u_season=2324&u_season_start=2023&u_season_end=2024&page=1')
-# swimmers += crawler.crawl_swimmers('https://swimstandards.com/rankings/50fr-scy-9-10-female-pc_alto?target=3&u_season=2324&u_season_start=2023&u_season_end=2024&page=1')
-# swimmers += crawler.crawl_swimmers('https://swimstandards.com/rankings/50fr-scy-9-10-female-pc_alto?target=3&u_season=2324&u_season_start=2023&u_season_end=2024&page=2')
-# swimmers += crawler.crawl_swimmers('https://swimstandards.com/rankings/50fr-scy-11-12-female-pc_alto?target=5&u_season=2324&u_season_start=2023&u_season_end=2024&page=1')
-# swimmers += crawler.crawl_swimmers('https://swimstandards.com/rankings/50fr-scy-11-12-female-pc_alto?target=5&u_season=2324&u_season_start=2023&u_season_end=2024&page=2')
-# for swimmer in sorted(set(swimmers)):  
-#   print(f"'{swimmer}',")
-
 # -------------------- Test EventStore --------------------------
 # from utils import EventStore
 # event_store = EventStore(sqldb_file='swimmers_test.db')
