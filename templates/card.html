@@ -400,7 +400,8 @@ function headroom(timestr1, timestr2){
     sec1 = toSeconds(timestr1);
     sec2 = toSeconds(timestr2);
     if (sec2 < sec1) {
-        return "-"+toTimeStr(sec1-sec2);
+        // return "-"+toTimeStr(sec1-sec2);
+        return ""
     } else {
         return "+"+toTimeStr(sec2-sec1);
     }
