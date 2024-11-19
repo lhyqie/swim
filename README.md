@@ -1,5 +1,8 @@
 ## Service API
 
+- Search Swimmer name, team
+    1. `/search?q={:term}`
+
 - Query One Qualifying Time + National Time + Multiple Swimmers
 
     1. `/board?id=swimmer1,swimmer2&ts=JO-10-MALE`
@@ -28,12 +31,17 @@
 
 ## Data Maintenance 
 
-1.  Add swimmers in drop down list.
-
-     - run `swimmers_crawl.py` and save the results to `swimmers.py`
-
-
-2.  Update time standards.
-
+1.  Update time standards.
      - update `data/*.csv` based on most recent timestandards
-     - run `data/export.py` and save the results to times.py
+     - cd to root folder
+     - run `python -m data.export` and save the results to times.py
+
+2.  Add swimmers to .py file which feeds into the drop down list.
+     - cd to root folder
+     - run `python -m data.crawl_swimmer_py and save the results to `swimmers.py`
+
+3.  Add swimmer profile to .csv file and database.
+    - cd to root folder
+    - run `python -m data.crawl_swimmer_csv` to update `swimmer-profile-top1000-per-group.csv`
+    - run `python -m data.build_swimmer_profile_db` to update `swimmer-profile.db`
+

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Swimmer Search</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" crossorigin="anonymous">
+  <script src="https://unpkg.com/htmx.org@1.9.4"></script>
+</head>
+
+<body>
+  <center> <h1> <img width="200px" src="{{ url_for('static',filename='logo.jpeg') }}" /> </h1>
+
+  <a href="/swim" id="toswim" class="btn btn-secondary btn-lg">To Single Swimmer View</a> &nbsp;&nbsp;
+  <a href="/compare" id="tocompare" class="btn btn-success btn-lg">To Multiple Swimmers View</a> &nbsp;&nbsp;
+  </center>
+
+  <section class="section">
+
+    <!-- <div class="columns">
+      <div class="column is-one-third is-offset-one-third">        
+        <input type="text" class="input" placeholder="Search Swimmer Name and/or Team" name="q" hx-get="/search_results_from_db" hx-trigger="keyup changed delay:500ms" hx-target="#results">
+      </div>
+    </div>
+    <table class="table is-fullwidth">
+      <thead>
+        <tr>
+          <th>Swimmer ID</th>
+          <th>First Name</th>
+          <th>Last Name</th>
+          <th>Team</th>
+          <th>Age</th>
+        </tr>
+      </thead>
+      <tbody id="results"></tbody>
+    </table> -->
+
+    <div class="columns">
+      <div class="column is-one-third is-offset-one-third" style="width:80%; padding:12px 20px; margin: 8px 0; box-sizing: border-box;">
+        <input style="font-size:18px; display: inline-block; width: 400px; text-align: center;" type="text" class="input" placeholder="Search Swimmer Name and/or Team" name="q" hx-get="/search_results_from_api" hx-trigger="keyup changed delay:500ms" hx-target="#results">
+      </div>
+    </div>
+    <div style="width:80%; padding:12px 20px; margin: 8px 0; text-align: left;">
+    <table class="table is-fullwidth">
+      <thead>
+        <tr>
+          <th>Swimmer ID</th>
+          <th>Name </th>
+          <th>Team</th>
+          <th>Age</th>
+          <th>Gender</th>
+        </tr>
+      </thead>
+      <h6 align="left" style="color: gray;"> Search results are limited to top 10. Add Team name or use full name to search more precisely. </h4>
+      <p></p>
+      <tbody id="results"></tbody>
+    </table>
+    </div>
+
+  </section>
+</body>
+
+</html>

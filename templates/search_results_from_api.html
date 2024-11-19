@@ -1,0 +1,11 @@
+{% for result in results %}
+
+<tr>
+    <td> <a href="/card?id={{ result.slug }}"> {{ result.slug }} <img width="15px" src="{{ url_for('static',filename='open-link.png') }}"/>  </a> </td>
+    <td>{{ result.name }}</td>
+    <td>{{ result.team }}</td>
+    <td>{{ result.age }}</td>
+    <td>{{ result.sex }}</td>
+</tr>
+
+{% endfor %}

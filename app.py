@@ -1,18 +1,36 @@
 from datetime import timedelta
-from flask import Flask, render_template, request, session, redirect, url_for, after_this_request
+from flask import Blueprint, Flask, render_template, request, session, redirect, url_for, after_this_request
+from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import FlaskForm
 from utils import ScoreBoard, ScoreCard
 from wtforms import SelectField, TextAreaField
 from swimmers import predefined_swimmers
 from times import times_name_pair, national_times_name_pair, national_timemap
+from data.schema import db, SwimmerProfile
 
+import json
 import logging
-import sqlite3
+import requests
 import os
+import sqlite3
+import urllib.parse
 
+
+basedir = os.path.abspath(os.path.dirname(__file__))
+main = Blueprint("main", __name__)
 app = Flask(__name__)
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY') or 'you-will-never-guess'
-app.config['PERMANENT_SESSION_LIFETIME'] =  timedelta(minutes=5)
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY') or 'you-will-never-guess'  # this need to be top-level, otherwise server will throw error: RuntimeError: A secret key is required to use CSRF.
+
+def create_app():    
+    app.config['PERMANENT_SESSION_LIFETIME'] =  timedelta(minutes=5)
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'data', 'swimmer-profile.db')
+    app.config["SQLALCHEMY_ECHO"] = True
+    app.config["SQLALCHEMY_RECORD_QUERIES"] = True
+    app.register_blueprint(main)
+
+    with app.app_context():
+      db.init_app(app)    
+
 
 @app.context_processor
 def utility_processor_compare_time():
@@ -39,7 +57,6 @@ def utility_processor_national_time_tool_tip():
     return dict(national_time_tool_tip=national_time_tool_tip)
 
 
-@app.route('/', methods=('GET', 'POST'))
 @app.route('/board', methods=('GET', 'POST'))
 def board(format='records+nationaltime'):
   timestandard = request.args.get('ts') or session.get('ts') or 'JO-10-MALE'
@@ -116,6 +133,38 @@ def card():
                          records=records, rownames=rownames, colnames=colnames, form=form)
 
 
+@app.route('/', methods=('GET', 'POST'))
+@app.route('/search')
+def index():
+    return render_template("search.html")
+  
+@app.route('/search_results_from_db')
+def search_db():
+    q = request.args.get("q")
+    logging.debug(f'q={q}')
+    
+    results = set()
+    keys = q.strip().split()
+    
+    for key in keys:
+        matches = SwimmerProfile.query.filter(SwimmerProfile.firstname.icontains(key) | SwimmerProfile.lastname.icontains(key) | SwimmerProfile.team.icontains(key))
+        for match in matches:
+            results.add(match)
+    return render_template("search_results_from_db.html", results=sorted(results))
+
+  
+@app.route("/search_results_from_api")
+def search_api():
+    q = request.args.get("q")
+    q = urllib.parse.quote(q)
+    logging.debug(f'q={q}')
+    url = f'https://api.swimstandards.com/swimmers?$search={q}&lsc=&$limit=10&$skip=0'
+    logging.debug(f'fetch result from API via {url}')
+    response = requests.get(url)
+    entries = json.loads(response.content)['data']
+    return render_template("search_results_from_api.html", results=entries)
+
+
 class ScoreBoardForm(FlaskForm):
   more_swimmers = TextAreaField('More Free-text Swimmers')
   timestandard = SelectField('Championship Meet Qualifying Time Standards', choices=times_name_pair, default="JO-10-MALE")
@@ -131,6 +180,7 @@ class ScoreCardForm(FlaskForm):
 def form():
   form = ScoreBoardForm()
   return render_template('form.html', predefined_swimmers=predefined_swimmers, form=form)
+
 
 @app.route('/swimmer/', methods=('GET', 'POST'))
 @app.route('/swim/', methods=('GET', 'POST'))
@@ -158,4 +208,6 @@ if  __name__ == '__main__':
   if debug:
     logging.basicConfig(format='%(asctime)s %(levelname)-8s %(message)s', 
                         level=logging.DEBUG, datefmt='%Y-%m-%d %H:%M:%S')
+  
+  create_app()
   app.run(debug=debug, port=port)

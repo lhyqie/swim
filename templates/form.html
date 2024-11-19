@@ -3,6 +3,7 @@
 <head>
 <title>Time Standards vs Swimmers</title>
 <link rel="stylesheet" type="text/css" href= "{{ url_for('static',filename='table.css') }}">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" crossorigin="anonymous">
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.2/css/bootstrap-select.min.css">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
@@ -16,7 +17,9 @@
 <br/>
 <form id="multiple_select_form" action="/board" method="post">
 <br/>
-<a href="/swim" id="goback" class="btn btn-primary btn-lg">To Single Swimmer View</a>
+<a href="/search" id="tosearch" class="btn btn-primary btn-lg">To Search</a> &nbsp;&nbsp;
+<a href="/swim" id="toswim" class="btn btn-secondary btn-lg">To Single Swimmer View</a> &nbsp;&nbsp;
+<a href="/compare" id="tocompare" class="btn btn-success btn-lg">To Multiple Swimmers View</a> &nbsp;&nbsp;
 <br/><br/>
 <b>Pick one or more Swimmers</b>  &nbsp;&nbsp;
 <select name="swimmers" id="swimmers" class="selectpicker" data-width="auto" data-live-search="true" multiple>  

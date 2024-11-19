@@ -1,4 +1,5 @@
 from utils import SwimStandardsCrawler
+
 crawler = SwimStandardsCrawler()
 
 urls = [
