@@ -5,10 +5,17 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Swimmer Search</title>
+  <style>
+    .loader {
+      display: none;
+    }
+    .htmx-request {
+      display: block;
+    }
+  </style>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" crossorigin="anonymous">
   <script src="https://unpkg.com/htmx.org@1.9.4"></script>
 </head>
-
 <body>
   <center> <h1> <img width="200px" src="{{ url_for('static',filename='logo.jpeg') }}" /> </h1>
 
@@ -38,7 +45,7 @@
 
     <div class="columns">
       <div class="column is-one-third is-offset-one-third" style="width:80%; padding:12px 20px; margin: 8px 0; box-sizing: border-box;">
-        <input style="font-size:18px; display: inline-block; width: 400px; text-align: center;" type="text" class="input" placeholder="Search Swimmer Name and/or Team" name="q" hx-get="/search_results_from_api" hx-trigger="keyup changed delay:500ms" hx-target="#results">
+        <input style="font-size:18px; display: inline-block; width: 400px; text-align: center;" type="text" class="input" placeholder="Search Swimmer Name and/or Team" name="q" hx-get="/search_results_from_api" hx-trigger="keyup changed delay:500ms" hx-target="#results" hx-indicator="#spinner" autofocus>
       </div>
     </div>
     <div style="width:80%; padding:12px 20px; margin: 8px 0; text-align: left;">
@@ -54,6 +61,7 @@
       </thead>
       <h6 align="left" style="color: gray;"> Search results are limited to top 10. Add Team name or use full name to search more precisely. </h4>
       <p></p>
+      <img width="200px" id="spinner" class="htmx-indicator loader" src="{{ url_for('static',filename='infinite-spinner.svg') }}" />
       <tbody id="results"></tbody>
     </table>
     </div>
