@@ -21,6 +21,7 @@ main = Blueprint("main", __name__)
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY') or 'you-will-never-guess'  # this need to be top-level, otherwise server will throw error: RuntimeError: A secret key is required to use CSRF.
 
+
 def create_app():    
     app.config['PERMANENT_SESSION_LIFETIME'] =  timedelta(minutes=5)
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'data', 'swimmer-profile.db')
@@ -43,6 +44,7 @@ def utility_processor_compare_time():
         return False
       return timeint1 < timeint2
     return dict(compare_time=compare_time)
+
 
 @app.context_processor
 def utility_processor_national_time_tool_tip():
@@ -133,11 +135,22 @@ def card():
                          records=records, rownames=rownames, colnames=colnames, form=form)
 
 
+class ScoreBoardForm(FlaskForm):
+  more_swimmers = TextAreaField('More Free-text Swimmers')
+  timestandard = SelectField('Championship Meet Qualifying Time Standards', choices=times_name_pair, default="JO-10-MALE")
+  nationaltime = SelectField('(Optional) National Age Group Motivational Time', choices=national_times_name_pair)
+
+
+class ScoreCardForm(FlaskForm):
+  nationaltime = SelectField('National Age Group Motivational Time', choices=national_times_name_pair)
+
+
 @app.route('/', methods=('GET', 'POST'))
 @app.route('/search')
 def index():
     return render_template("search.html")
-  
+
+
 @app.route('/search_results_from_db')
 def search_db():
     q = request.args.get("q")
@@ -165,16 +178,6 @@ def search_api():
     return render_template("search_results_from_api.html", results=entries)
 
 
-class ScoreBoardForm(FlaskForm):
-  more_swimmers = TextAreaField('More Free-text Swimmers')
-  timestandard = SelectField('Championship Meet Qualifying Time Standards', choices=times_name_pair, default="JO-10-MALE")
-  nationaltime = SelectField('(Optional) National Age Group Motivational Time', choices=national_times_name_pair)
-
-
-class ScoreCardForm(FlaskForm):
-  nationaltime = SelectField('National Age Group Motivational Time', choices=national_times_name_pair)
-
-
 @app.route('/compare/', methods=('GET', 'POST'))
 @app.route('/select/', methods=('GET', 'POST'))
 def form():
@@ -182,12 +185,30 @@ def form():
   return render_template('form.html', predefined_swimmers=predefined_swimmers, form=form)
 
 
-@app.route('/swimmer/', methods=('GET', 'POST'))
 @app.route('/swim/', methods=('GET', 'POST'))
 def form2():
   form = ScoreCardForm()
   return render_template('form2.html', predefined_swimmers=predefined_swimmers, form=form)
-  
+
+
+@app.route('/swimmer/', methods=('GET', 'POST'))
+def form3():
+  form = ScoreBoardForm()
+  return render_template('form3.html', predefined_swimmers=predefined_swimmers, form=form)
+
+
+@app.route('/swimmer_selector')
+def swimmer_selector():
+  q = request.args.get("q")
+  format = request.args.get("format")
+  q = urllib.parse.quote(q)
+  logging.debug(f'q={q}, format={format}')
+  url = f'https://api.swimstandards.com/swimmers?$search={q}&lsc=&$limit=10&$skip=0'
+  logging.debug(f'fetch result from API via {url}')
+  response = requests.get(url)
+  entries = json.loads(response.content)['data']
+  return render_template("search_results_from_api.html", results=entries, format=format)
+
 
 @app.route('/cache/')
 @app.route('/cachedb/')

@@ -1,11 +1,19 @@
-{% for result in results %}
+{%if format == 'list' %}
+    {% for result in results %}
+    <option>
+    {{ result.slug }}, {{ result.name }} ({{ result.sex }} - {{ result.age }}) @ {{ result.team }} 
+    </option>
+    {% endfor %}
 
-<tr>
-    <td> <a href="/card?id={{ result.slug }}"> {{ result.slug }} <img width="15px" src="{{ url_for('static',filename='open-link.png') }}"/>  </a> </td>
-    <td>{{ result.name }}</td>
-    <td>{{ result.team }}</td>
-    <td>{{ result.age }}</td>
-    <td>{{ result.sex }}</td>
-</tr>
+{% else %}
 
-{% endfor %}
+    {% for result in results %}
+    <tr>
+        <td> <a href="/card?id={{ result.slug }}"> {{ result.slug }} <img width="15px" src="{{ url_for('static',filename='open-link.png') }}"/>  </a> </td>
+        <td>{{ result.name }}</td>
+        <td>{{ result.team }}</td>
+        <td>{{ result.age }}</td>
+        <td>{{ result.sex }}</td>
+    </tr>
+    {% endfor %}
+{% endif  %}

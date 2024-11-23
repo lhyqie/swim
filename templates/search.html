@@ -18,13 +18,11 @@
 </head>
 <body>
   <center> <h1> <img width="200px" src="{{ url_for('static',filename='logo.jpeg') }}" /> </h1>
-
-  <a href="/swim" id="toswim" class="btn btn-secondary btn-lg">To Single Swimmer View</a> &nbsp;&nbsp;
-  <a href="/compare" id="tocompare" class="btn btn-success btn-lg">To Multiple Swimmers View</a> &nbsp;&nbsp;
+  <a href="/swimmer" id="tocompare" class="btn btn-success btn-lg">To Multiple Swimmers View</a>
   </center>
 
+  <div class="container">
   <section class="section">
-
     <!-- <div class="columns">
       <div class="column is-one-third is-offset-one-third">        
         <input type="text" class="input" placeholder="Search Swimmer Name and/or Team" name="q" hx-get="/search_results_from_db" hx-trigger="keyup changed delay:500ms" hx-target="#results">
@@ -67,6 +65,7 @@
     </div>
 
   </section>
+  </div>
 </body>
 
 </html>
