@@ -231,4 +231,4 @@ if  __name__ == '__main__':
                         level=logging.DEBUG, datefmt='%Y-%m-%d %H:%M:%S')
   
   create_app()
-  app.run(host='192.168.1.114', debug=debug, port=port)
+  app.run(debug=debug, port=port)
