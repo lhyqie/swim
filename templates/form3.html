@@ -84,10 +84,10 @@
       }
 
       /* container */
-      .three-columns-grid {
+      .two-columns-grid {
           display: grid;
           grid-auto-rows: 1fr;
-          grid-template-columns: 1fr 1fr 1fr;
+          grid-template-columns: 1fr 1fr;
       }
 
       /* columns */
@@ -124,7 +124,7 @@
         <br>
         <a href="/search" id="tosearch" class="btn btn-primary btn-lg">To Single Swimmer View</a> &nbsp;&nbsp;
       </center>
-      <div class="three-columns-grid" style="margin: auto;">
+      <div class="two-columns-grid" style="margin-top: 20px;">
         <div style="margin: auto;">
           <input id="searchbox" style="width: 280px !important; margin: auto;" type="text" class="input" placeholder="Search Swimmers" name="q" hx-get="/swimmer_selector" hx-vals='{"format": "list"}' hx-trigger="keyup changed delay:500ms" hx-target="#swimmer_selector" autofocus/>
           <br><br>
@@ -132,21 +132,13 @@
             <option value="unset">(Search to Populate)</option>
           </select>
         </div>
-        <div style="display: table-cell; vertical-align: middle; margin: auto;"><button onclick="addRow()">Add</button></div>
+        <div style="margin: auto;"><button onclick="addRow()">Add</button></div>
       </div>
       
       <br>
-      <!-- <table class="table table-bordered table-striped table-responsive-stack"  id="tableOne">
-        <thead class="thead-dark">
-          <tr>
-            <th><input type=""text" class="header-input" value="ID"></th>
-            <th><input type=""text" class="header-input" value="Swimmer"></th>
-            <th style="width: 150px;"><input type=""text" class="header-input" value=""/></th>
-          </tr>
-        </thead>
-      </table> -->
-      <table class="table table-bordered table-striped table-responsive-stack"  id="tableOne">
-        <thead class="thead-dark">
+
+      <table class="table table-bordered table-striped table-responsive-stack" id="tableOne">
+        <thead class="thead-light">
             <tr>
               <th>ID</th>
               <th>Swimmer</th>
