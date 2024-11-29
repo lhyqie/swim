@@ -12,16 +12,19 @@
     .htmx-request {
       display: block;
     }
+    .container {
+      text-align: center;
+      margin: auto;
+      width: 50%;
+    }
   </style>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" crossorigin="anonymous">
   <script src="https://unpkg.com/htmx.org@1.9.4"></script>
 </head>
 <body>
-  <center> <h1> <img width="200px" src="{{ url_for('static',filename='logo.jpeg') }}" /> </h1>
+  <div class="container" style="padding:12px 20px; box-sizing: border-box;">
+  <h1> <img width="100px" src="{{ url_for('static',filename='logo.jpeg') }}" /> </h1>
   <a href="/swimmer" id="tocompare" class="btn btn-success btn-lg">To Multiple Swimmers View</a>
-  </center>
-
-  <div class="container">
   <section class="section">
     <!-- <div class="columns">
       <div class="column is-one-third is-offset-one-third">        
@@ -41,24 +44,24 @@
       <tbody id="results"></tbody>
     </table> -->
 
-    <div class="columns">
-      <div class="column is-one-third is-offset-one-third" style="width:80%; padding:12px 20px; margin: 8px 0; box-sizing: border-box;">
-        <input style="font-size:18px; display: inline-block; width: 400px; text-align: center;" type="text" class="input" placeholder="Search Swimmer Name and/or Team" name="q" hx-get="/search_results_from_api" hx-trigger="keyup changed delay:500ms" hx-target="#results" hx-indicator="#spinner" autofocus>
+    <div>
+      <div style="padding:12px 20px; margin: 8px 0; box-sizing: border-box;">
+        <input style="font-size:18px; display: inline-block; width: 350px; text-align: center;" type="text" class="input" placeholder="Search Swimmer Name and/or Team" name="q" hx-get="/search_results_from_api" hx-trigger="keyup changed delay:500ms" hx-target="#results" hx-indicator="#spinner" autofocus>
       </div>
+      <div style="text-align: left; width:100%; padding:0px 10px; margin: 0px 0; color: gray; width: 100%; font-size: 11px;  line-height: 1.2;"> Results are limited to top 10. <br> Add Team name or full name to refine. </div>
     </div>
-    <div style="width:80%; padding:12px 20px; margin: 8px 0; text-align: left;">
+  
+    <div style="padding:12px 20px; margin: 8px 0; text-align: left;">
     <table class="table is-fullwidth">
       <thead>
         <tr>
-          <th>Swimmer ID</th>
+          <th>ID</th>
           <th>Name </th>
           <th>Team</th>
           <th>Age</th>
           <th>Gender</th>
         </tr>
       </thead>
-      <h6 align="left" style="color: gray;"> Search results are limited to top 10. Add Team name or use full name to search more precisely. </h4>
-      <p></p>
       <img width="200px" id="spinner" class="htmx-indicator loader" src="{{ url_for('static',filename='infinite-spinner.svg') }}" />
       <tbody id="results"></tbody>
     </table>
