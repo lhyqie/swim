@@ -130,10 +130,15 @@ def extract_fw(pdf_path):
         jobj[key] = {}
         for event in event2rowId:
           if event in ages2fwevents[age]:
-            # column offset = 1 + (age - 10) * 3 + o
+            age2colindex = {
+              '10': 0 * 3,
+              '11-12' : 1 * 3,
+              '13-14' : 2 * 3,
+            }
+            # column offset = 1 + age2colindex[age] + o
             # o is 0 if SCY else 1
             offset = 1
-            offset += (int(age[:2]) - 10) * 3
+            offset += age2colindex[age]
             if ' Y ' in event:
               offset += 0
             elif ' M ' in event:
