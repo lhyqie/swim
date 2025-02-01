@@ -1,9 +1,9 @@
-# From # https://websitedevsa.blob.core.windows.net/sitefinity/docs/default-source/timesdocuments/time-standards/2025/2028-motivational-standards-age-group.pdf
+# From https://websitedevsa.blob.core.windows.net/sitefinity/docs/default-source/timesdocuments/time-standards/2025/2028-motivational-standards-age-group.pdf
 
 import json
 import pdfplumber
 
-from data.common import ages2events, full_event_list
+from data.common import full_event_list
 
 
 event_map = {
@@ -169,5 +169,5 @@ def extract_national(pdf_path):
   return jobj
 
 if __name__ == '__main__':
-  jobj = extract_national("data/2024-2028-national-time.pdf")
+  jobj = extract_national("data/download-national-time.pdf")
   print(json.dumps(jobj, indent=2))

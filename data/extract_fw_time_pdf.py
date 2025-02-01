@@ -1,16 +1,35 @@
-# From https://www.pacswim.org/userfiles/cms/documents/809/agc-time-std.-scy-2024-2025-rev-8.27.24.pdf
-# NOTE: JO-14-MALE data has some noise. 
-# Run this script and manually fix '50 Y Free' for JO-14-MALE
+# From https://www.pacswim.org/userfiles/cms/documents/859/fw-time-std.---spring-2025-rev-8.27.24.pdf
 
 import json
 import pdfplumber
 import os
 import requests
 
-from data.common import ages2agcevents
+from data.common import ages2fwevents
+
+def open_pdf_from_url(url, tmp_file):
+    """
+    Downloads a PDF from a URL and opens it using the default system viewer.
+
+    Args:
+        url (str): The URL of the PDF file.
+    """
+    try:
+        response = requests.get(url, stream=True)
+        response.raise_for_status()  # Raise HTTPError for bad responses (4xx or 5xx)
+        # Create a temporary file to store the PDF
+        with open(tmp_file, "wb") as f:
+            for chunk in response.iter_content(chunk_size=8192):
+                f.write(chunk)
+    except requests.exceptions.RequestException as e:
+        print(f"Error downloading PDF: {e}")
+    except FileNotFoundError:
+        print("Error: temp.pdf not found.")
+    except Exception as e:
+      print(f"An unexpected error occurred: {e}")
 
 
-def extract_agc(pdf_path):
+def extract_fw(pdf_path):
     def _read_pdf(pdf_path):
       # Open the PDF file
       with pdfplumber.open(pdf_path) as pdf:
@@ -31,7 +50,6 @@ def extract_agc(pdf_path):
                           all_tables.extend(table)
       # content only extracted to all_tables[0][0]
       return all_tables[0][0]
-
 
     def _process_lines(lines):
       rows = []
@@ -107,15 +125,15 @@ def extract_agc(pdf_path):
       }
       # for line in lines:
       #   print(line)
-      for age in ages2agcevents:
-        key = 'JO-' + age + '-' + gender
+      for age in ages2fwevents:
+        key = 'FW-' + age + '-' + gender
         jobj[key] = {}
         for event in event2rowId:
-          if event in ages2agcevents[age]:
+          if event in ages2fwevents[age]:
             # column offset = 1 + (age - 10) * 3 + o
             # o is 0 if SCY else 1
             offset = 1
-            offset += (int(age) - 10) * 3
+            offset += (int(age[:2]) - 10) * 3
             if ' Y ' in event:
               offset += 0
             elif ' M ' in event:
@@ -147,5 +165,5 @@ def extract_agc(pdf_path):
 
 
 if __name__ == '__main__':
-  jobj = extract_agc(pdf_path='data/download-agc-time.pdf')
+  jobj = extract_fw(pdf_path='data/download-fw-time.pdf')
   print(json.dumps(jobj, indent=2))

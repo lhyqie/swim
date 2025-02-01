@@ -32,19 +32,22 @@
 ## Data Maintenance 
 
 1.  Update time standards.
-     - update `data/*.csv` based on most recent timestandards
-     - cd to root folder
-     - run `python -m data.extract_agc_time_pdf` and save the results to times.py > times_map
-
-2.  Update Age Group Championship qualifying time.
      - cd to root folder
      - run `python -m data.extract_national_time_pdf` and save the results to times.py > national_timemap
 
-3.  Add swimmers to .py file which feeds into the drop down list.
+2.  Update Age Group Championship qualifying time.
+     - cd to root folder
+     - run `python -m data.extract_agc_time_pdf` and save the results to times.py > times_map
+
+3.  Update Far Western Championship qualifying time.
+     - cd to root folder
+     - run `python -m data.extract_fw_time_pdf` and save the results to times.py > times_map
+
+4.  Add swimmers to .py file which feeds into the drop down list.
      - cd to root folder
      - run `python -m data.crawl_swimmer_py and save the results to `swimmers.py`
 
-4.  Add swimmer profile to .csv file and database.
+5.  Add swimmer profile to .csv file and database.
     - cd to root folder
     - run `python -m data.crawl_swimmer_csv` to update `swimmer-profile-top1000-per-group.csv`
     - run `python -m data.build_swimmer_profile_db` to update `swimmer-profile.db`
