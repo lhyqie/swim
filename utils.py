@@ -401,6 +401,8 @@ class ScoreCard:
         self.national_time += "10-" + self.gender.upper()
       elif 11<= self.age <= 12:
         self.national_time += "11-12-" + self.gender.upper()
+      elif 13<= self.age <= 14:
+        self.national_time += "13-14-" + self.gender.upper()
       else:
         self.national_time = '10-MALE'
     rownames = [k for k, _ in self.board[1].items()]

@@ -1,7 +1,38 @@
+# From https://www.pacswim.org/userfiles/cms/documents/809/agc-time-std.-scy-2024-2025-rev-8.27.24.pdf
+# and https://www.pacswim.org/userfiles/cms/documents/859/fw-time-std.---spring-2025-rev-8.27.24.pdf
+
+import json
 import pdfplumber
+import os
+import requests
 
-def extract_agc(pdf_path):
+from data.common import ages2events
 
+def open_pdf_from_url(url, tmp_file):
+    """
+    Downloads a PDF from a URL and opens it using the default system viewer.
+
+    Args:
+        url (str): The URL of the PDF file.
+    """
+    try:
+        response = requests.get(url, stream=True)
+        response.raise_for_status()  # Raise HTTPError for bad responses (4xx or 5xx)
+        # Create a temporary file to store the PDF
+        with open(tmp_file, "wb") as f:
+            for chunk in response.iter_content(chunk_size=8192):
+                f.write(chunk)
+    except requests.exceptions.RequestException as e:
+        print(f"Error downloading PDF: {e}")
+    except FileNotFoundError:
+        print("Error: temp.pdf not found.")
+    except Exception as e:
+      print(f"An unexpected error occurred: {e}")
+
+
+def extract_agc(pdf_url):
+    tmp_file="/tmp/agc_time.pdf"
+    open_pdf_from_url(pdf_url, tmp_file)
     def _read_pdf(pdf_path):
       # Open the PDF file
       with pdfplumber.open(pdf_path) as pdf:
@@ -9,11 +40,11 @@ def extract_agc(pdf_path):
 
           # Iterate through each page
           for page_num, page in enumerate(pdf.pages):
-              print(f"Processing page {page_num + 1}...")
+              # print(f"Processing page {page_num + 1}...")
 
               # Extract tables from the page
               tables = page.extract_tables()
-              print(f"Total {len(tables)} tables")
+              # print(f"Total {len(tables)} tables")
               
               # If tables are found, add them to the list
               if tables:
@@ -36,15 +67,15 @@ def extract_agc(pdf_path):
         
         if event in ['800/1000 FR', '1500/1650 FR', '200 BK', '200 BR', '200 FL', '400 IM']:
           # Those event not in 10 & U
-          row = [event] + ['-'] * 3 + row[1:]
+          row = [event] + [''] * 3 + row[1:]
         elif event in ['50 BK', '50 BR', '50 FL']:
           # Those event not in 13 and 14
-          row.extend(['-'] * 6)
+          row.extend([''] * 6)
         elif event in ['100 IM']:
-          row.insert(2, '-')
-          row.insert(5, '-')
-          row.insert(8, '-')
-          row.extend(['-'] * 6)
+          row.insert(2, '')
+          row.insert(5, '')
+          row.insert(8, '')
+          row.extend([''] * 6)
 
         rows.append(row)
       return rows
@@ -52,168 +83,6 @@ def extract_agc(pdf_path):
 
     def _to_json(lines, gender):
       jobj = {}
-      ages2events = {
-        'JO-10':  [
-                    '50 Y Free', 
-                    '100 Y Free',
-                    '200 Y Free',
-                    '500 Y Free'
-                    '50 Y Back',
-                    '100 Y Back',
-                    '50 Y Breast',
-                    '100 Y Breast',
-                    '200 Y Breast',
-                    '50 Y Fly',
-                    '100 Y Fly',
-                    '100 Y IM',
-                    '200 Y IM',
-                    '50 M Free',
-                    '100 M Free',
-                    '200 M Free',
-                    '400 M Free',
-                    '50 M Back',
-                    '100 M Back',
-                    '50 M Breast',
-                    '100 M Breast',
-                    '50 M Fly',
-                    '100 M Fly',
-                    '200 M IM',
-                  ],
-        'JO-11':  [
-                    '50 Y Free',
-                    '100 Y Free',
-                    '200 Y Free',
-                    '500 Y Free',
-                    '1000 Y Free',
-                    '1650 Y Free',
-                    '50 Y Back',
-                    '100 Y Back', 
-                    '200 Y Back' ,
-                    '50 Y Breast',
-                    '100 Y Breast',
-                    '200 Y Breast',
-                    '50 Y Fly',
-                    '100 Y Fly',  
-                    '200 Y Fly', 
-                    '100 Y IM', 
-                    '200 Y IM',  
-                    '400 Y IM',
-                    '50 M Free',
-                    '100 M Free',
-                    '200 M Free',
-                    '400 M Free',
-                    '800 M Free',
-                    '1500 M Free',
-                    '50 M Back',
-                    '100 M Back',
-                    '200 M Back',
-                    '50 M Breast',
-                    '100 M Breast',
-                    '200 M Breast',
-                    '50 M Fly',
-                    '100 M Fly',
-                    '200 M Fly',
-                    '200 M IM',
-                    '400 M IM',
-                  ],
-        'JO-12':  [
-                    '50 Y Free',
-                    '100 Y Free',
-                    '200 Y Free',
-                    '500 Y Free',
-                    '1000 Y Free',
-                    '1650 Y Free',
-                    '50 Y Back',
-                    '100 Y Back', 
-                    '200 Y Back' ,
-                    '50 Y Breast',
-                    '100 Y Breast',
-                    '200 Y Breast',
-                    '50 Y Fly',
-                    '100 Y Fly',  
-                    '200 Y Fly', 
-                    '100 Y IM', 
-                    '200 Y IM',  
-                    '400 Y IM',
-                    '50 M Free',
-                    '100 M Free',
-                    '200 M Free',
-                    '400 M Free',
-                    '800 M Free',
-                    '1500 M Free',
-                    '50 M Back',
-                    '100 M Back',
-                    '200 M Back',
-                    '50 M Breast',
-                    '100 M Breast',
-                    '200 M Breast',
-                    '50 M Fly',
-                    '100 M Fly',
-                    '200 M Fly',
-                    '200 M IM',
-                    '400 M IM',
-                  ],
-        'JO-13':  [
-                    '50 Y Free',
-                    '100 Y Free',
-                    '200 Y Free',
-                    '500 Y Free',
-                    '1000 Y Free',
-                    '1650 Y Free',
-                    '100 Y Back', 
-                    '200 Y Back' ,
-                    '100 Y Breast',
-                    '200 Y Breast',
-                    '100 Y Fly',  
-                    '200 Y Fly', 
-                    '200 Y IM',  
-                    '400 Y IM',
-                    '50 M Free',
-                    '100 M Free',
-                    '200 M Free',
-                    '400 M Free',
-                    '800 M Free',
-                    '1500 M Free',
-                    '100 M Back',
-                    '200 M Back',
-                    '100 M Breast',
-                    '200 M Breast',
-                    '100 M Fly',
-                    '200 M Fly',
-                    '200 M IM',
-                    '400 M IM',
-                  ],
-        'JO-14':  [
-                    '50 Y Free',
-                    '100 Y Free',
-                    '200 Y Free',
-                    '500 Y Free',
-                    '1000 Y Free',
-                    '1650 Y Free',
-                    '100 Y Back', 
-                    '200 Y Back' ,
-                    '100 Y Breast',
-                    '200 Y Breast',
-                    '100 Y Fly',  
-                    '200 Y Fly', 
-                    '200 Y IM',  
-                    '400 Y IM',
-                    '50 M Free',
-                    '100 M Free',
-                    '200 M Free',
-                    '400 M Free',
-                    '800 M Free',
-                    '1500 M Free',
-                    '100 M Back',
-                    '200 M Back',
-                    '100 M Breast',
-                    '200 M Breast',
-                    '100 M Fly',
-                    '200 M Fly',
-                    '200 M IM',
-                    '400 M IM',
-                  ]
-      }
       
       # event mapped to row in pdf.
       # -1 means do not exist.
@@ -255,21 +124,20 @@ def extract_agc(pdf_path):
           '50 M Fly':     12,
           '100 M Fly':    13,
           '200 M Fly':    14,
-          '100 M IM':     -1,
           '200 M IM':     16,
           '400 M IM':     17,
       }
-      for line in lines:
-        print(line)
+      # for line in lines:
+      #   print(line)
       for age in ages2events:
-        key = age + '-' + gender
+        key = 'JO-' + age + '-' + gender
         jobj[key] = {}
         for event in event2rowId:
           if event in ages2events[age]:
             # column offset = 1 + (age - 10) * 3 + o
             # o is 0 if SCY else 1
             offset = 1
-            offset += (int(age[3:]) - 10) * 3
+            offset += (int(age) - 10) * 3
             if ' Y ' in event:
               offset += 0
             elif ' M ' in event:
@@ -282,7 +150,7 @@ def extract_agc(pdf_path):
       return jobj
       
 
-    table = _read_pdf(pdf_path)
+    table = _read_pdf(tmp_file)
     lines = table.split('\n')    
     # girls section from line 4 to line 21
     girlslines = lines[4:22]
@@ -291,12 +159,15 @@ def extract_agc(pdf_path):
     # print(girlslines)
     # print(boyslines)
 
-    boyslines = _process_lines(boyslines)
     girlslines = _process_lines(girlslines)
+    boyslines = _process_lines(boyslines)
     
     import json
-    print(json.dumps(_to_json(girlslines, gender='MALE'), indent=4))
+    girls = _to_json(girlslines, gender='FEMALE')
+    boys = _to_json(boyslines, gender='MALE')
+    return {**girls, **boys}
 
 
 if __name__ == '__main__':
-  extract_agc(pdf_path="agc-time.pdf")
+  jobj = extract_agc(pdf_url='https://www.pacswim.org/userfiles/cms/documents/809/agc-time-std.-scy-2024-2025-rev-8.27.24.pdf')
+  print(json.dumps(jobj, indent=2))
