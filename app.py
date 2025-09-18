@@ -171,7 +171,8 @@ def search_api():
     q = request.args.get("q")
     q = urllib.parse.quote(q)
     logging.debug(f'q={q}')
-    url = f'https://api.swimstandards.com/swimmers?$search={q}&lsc=&$limit=10&$skip=0'
+    # url = f'https://api.swimstandards.com/swimmers?$search={q}&lsc=&$limit=10&$skip=0'
+    url = f'https://swimstandards.com/dnxapi/swimmers?$search={q}&lsc=&$limit=20&$skip=0'
     logging.debug(f'fetch result from API via {url}')
     response = requests.get(url)
     entries = json.loads(response.content)['data']

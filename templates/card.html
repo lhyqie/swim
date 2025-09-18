@@ -435,8 +435,8 @@ $(document).ready(function () {
     if (season != "lcm" && season != "scy") {
         const d = new Date();
         let month = d.getMonth();
-        // LCM season is from May to September
-        if (month >= 4 && month <=8) {
+        // LCM season is from May to August
+        if (month >= 4 && month <= 7) {
             season = "lcm";
         } else {
             season = "scy";
