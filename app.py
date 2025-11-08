@@ -174,7 +174,10 @@ def search_api():
     # url = f'https://api.swimstandards.com/swimmers?$search={q}&lsc=&$limit=10&$skip=0'
     url = f'https://swimstandards.com/dnxapi/swimmers?$search={q}&lsc=&$limit=20&$skip=0'
     logging.debug(f'fetch result from API via {url}')
-    response = requests.get(url)
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+    }
+    response = requests.get(url, headers=headers)
     entries = json.loads(response.content)['data']
     return render_template("search_results_from_api.html", results=entries)
 
@@ -204,9 +207,13 @@ def swimmer_selector():
   format = request.args.get("format")
   q = urllib.parse.quote(q)
   logging.debug(f'q={q}, format={format}')
-  url = f'https://api.swimstandards.com/swimmers?$search={q}&lsc=&$limit=10&$skip=0'
+  # url = f'https://api.swimstandards.com/swimmers?$search={q}&lsc=&$limit=10&$skip=0'
+  url = f'https://swimstandards.com/dnxapi/swimmers?$search={q}&lsc=&$limit=20&$skip=0'
   logging.debug(f'fetch result from API via {url}')
-  response = requests.get(url)
+  headers = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+  }
+  response = requests.get(url, headers=headers)
   entries = json.loads(response.content)['data']
   return render_template("search_results_from_api.html", results=entries, format=format)
 

@@ -4,3 +4,5 @@ tmp/
 *.py[cod]
 
 .DS_Store
+
+swimmers.db

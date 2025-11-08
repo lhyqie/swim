@@ -170,7 +170,10 @@ class SwimStandardsCrawler:
 
   # for example swimmer url: https://swimstandards.com/swimmer/abby-chan
   def crawl_all_events(self, url):
-    response = requests.get(url)
+    headers = {
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+    }
+    response = requests.get(url, headers=headers)
     # print(f'crawl {url}, status code {response.status_code}')
     soup = BeautifulSoup(response.content, 'html.parser')
     jobj = json.loads(soup.select_one('script#__NEXT_DATA__').string)
