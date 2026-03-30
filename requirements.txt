@@ -1,4 +1,5 @@
 bs4
+curl_cffi
 flask == 3.0.2      # 2.2.2
 # flask-mysql == 1.5.2
 # flask-mysqldb == 2.0.0

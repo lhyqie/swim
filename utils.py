@@ -170,13 +170,31 @@ class SwimStandardsCrawler:
 
   # for example swimmer url: https://swimstandards.com/swimmer/abby-chan
   def crawl_all_events(self, url):
-    headers = {
-      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-    }
-    response = requests.get(url, headers=headers)
-    # print(f'crawl {url}, status code {response.status_code}')
+    try:
+      from curl_cffi import requests as cffi_requests
+      response = cffi_requests.get(url, impersonate='chrome124')
+    except ImportError:
+      headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
+        'Accept-Language': 'en-US,en;q=0.9',
+        'Accept-Encoding': 'gzip, deflate, br',
+        'Referer': 'https://swimstandards.com/',
+        'Connection': 'keep-alive',
+        'Upgrade-Insecure-Requests': '1',
+        'Sec-Fetch-Dest': 'document',
+        'Sec-Fetch-Mode': 'navigate',
+        'Sec-Fetch-Site': 'same-origin',
+        'Sec-Fetch-User': '?1',
+      }
+      response = requests.get(url, headers=headers)
+    if response.status_code != 200:
+      raise RuntimeError(f'Failed to fetch {url}: HTTP {response.status_code}')
     soup = BeautifulSoup(response.content, 'html.parser')
-    jobj = json.loads(soup.select_one('script#__NEXT_DATA__').string)
+    script_tag = soup.find("script", {"id": "__NEXT_DATA__"})
+    if script_tag is None:
+      raise RuntimeError(f'Could not find __NEXT_DATA__ script tag in {url}')
+    jobj = json.loads(script_tag.string)
     swimmer_data = jobj['props']['pageProps']['swimmer']
     gender = swimmer_data['sex']
     age = swimmer_data['age']
@@ -269,8 +287,8 @@ class EventStore:
     try:
       events, gender, age = self.crawler.crawl_all_events('https://swimstandards.com/swimmer/' + swimmer_id)
       events = to_fastest(events)
-    except KeyError:
-      return []
+    except (KeyError, RuntimeError):
+      return [], None, None
     # use live fetched stats to database.
     self.swimmer_fastest_time_to_db(swimmer_id, events)
     return events, gender, age
@@ -374,7 +392,7 @@ class ScoreCard:
     self.national_time = nationaltime
     self.event_store = EventStore('swimmers.db')
     self.gender = 'Male'
-    self.age = '10'
+    self.age = 10
     # the first column is swimmmer, the next columns are time standards.
     self._add_swimmer_to_board()    
     self._add_all_time_standards_to_board()
@@ -384,8 +402,10 @@ class ScoreCard:
     self.swimmers.append(self.swimmer)
     column = {}
     events, gender, age = self.event_store.swimmer_fastest_time(self.swimmer, use_cache=False)
-    self.gender = gender
-    self.age = age
+    if gender is not None:
+      self.gender = gender
+    if age is not None:
+      self.age = int(age)
     for event in events:
       column[event.event_name] = event.time
     self.board.append(column)
