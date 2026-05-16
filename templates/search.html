@@ -26,29 +26,11 @@
   <h1> <img width="100px" src="{{ url_for('static',filename='logo.jpeg') }}" /> </h1>
   <a href="/swimmer" id="tocompare" class="btn btn-success btn-lg">To Multiple Swimmers View</a>
   <section class="section">
-    <!-- <div class="columns">
-      <div class="column is-one-third is-offset-one-third">        
-        <input type="text" class="input" placeholder="Search Swimmer Name and/or Team" name="q" hx-get="/search_results_from_db" hx-trigger="keyup changed delay:500ms" hx-target="#results">
-      </div>
-    </div>
-    <table class="table is-fullwidth">
-      <thead>
-        <tr>
-          <th>Swimmer ID</th>
-          <th>First Name</th>
-          <th>Last Name</th>
-          <th>Team</th>
-          <th>Age</th>
-        </tr>
-      </thead>
-      <tbody id="results"></tbody>
-    </table> -->
-
     <div>
       <div style="padding:12px 20px; margin: 8px 0; box-sizing: border-box;">
         <input style="font-size:18px; display: inline-block; width: 350px; text-align: center;" type="text" class="input" placeholder="Search Swimmer Name and/or Team" name="q" hx-get="/search_results_from_api" hx-trigger="keyup changed delay:500ms" hx-target="#results" hx-indicator="#spinner" autofocus>
       </div>
-      <div style="text-align: left; width:100%; padding:0px 10px; margin: 0px 0; color: gray; width: 100%; font-size: 11px;  line-height: 1.2;"> Results are limited to top 10. <br> Add Team name or full name to refine. </div>
+      <div style="text-align: left; width:100%; padding:0px 10px; margin: 0px 0; color: gray; width: 100%; font-size: 11px;  line-height: 1.2;"> Results come from the local swimmer profile CSV. <br> Add Team name or full name to refine. </div>
     </div>
   
     <div style="padding:12px 20px; margin: 8px 0; text-align: left;">

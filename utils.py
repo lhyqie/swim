@@ -1,23 +1,8 @@
 import json
 import requests
-import sqlite3
 from bs4 import BeautifulSoup
-from datetime import datetime
-from datetime import timedelta
-from flask import session
 from times import national_timemap,times_map,times_name_pair,time_name_fits_age_gender
 from typing import List
-
-
-def ensure_swimmers_table(conn):
-  conn.execute("""
-    CREATE TABLE IF NOT EXISTS swimmers (
-      id TEXT PRIMARY KEY,
-      fastest_time TEXT NOT NULL,
-      crawl_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-    )
-  """)
-  conn.commit()
 
 
 class Event:
@@ -270,61 +255,17 @@ class SwimStandardsCrawler:
         swimmer = a['href'].split('/')[-1]
         yield swimmer
 
-class EventStore:
-  def __init__(self, sqldb_file):
+class EventFetcher:
+  def __init__(self):
     self.crawler = SwimStandardsCrawler()
-    self.sqldb_file = sqldb_file
-    self.db_cache_expiry = timedelta(hours=6)
-    self.event_delim = '|'
-    self.event_time_delim = '-'
 
-  def swimmer_fastest_time(self, swimmer_id, use_cache=True):
-    gender = 'Male'
-    age = '10'
-    from_db = self.swimmer_fastest_time_from_db(swimmer_id)
-    if use_cache and len(from_db) > 0: 
-      cache_datetime = datetime.strptime(from_db[0]['crawl_date'], '%Y-%m-%d %H:%M:%S')
-      if (datetime.now() - cache_datetime) < self.db_cache_expiry:
-        events = []
-        for elem in from_db[0]['fastest_time'].strip().split(self.event_delim):
-          event = FastestEvent()
-          tokens = elem.split(self.event_time_delim)
-          event.event_name = tokens[0].strip()
-          event.time = tokens[1].strip()
-          events.append(event)
-        return events, gender, age
-
-    # events = self.crawler.crawl_fastest_time('https://swimstandards.com/swimmer/' + swimmer_id)
+  def swimmer_fastest_time(self, swimmer_id):
     try:
       events, gender, age = self.crawler.crawl_all_events('https://swimstandards.com/swimmer/' + swimmer_id)
       events = to_fastest(events)
     except (KeyError, RuntimeError):
       return [], None, None
-    # use live fetched stats to database.
-    self.swimmer_fastest_time_to_db(swimmer_id, events)
     return events, gender, age
-
-  def swimmer_fastest_time_from_db(self, swimmer_id):
-    conn = self._get_db_connection()
-    swimmers = conn.execute('SELECT * FROM swimmers WHERE id = ?', (swimmer_id,)).fetchall()
-    conn.close()
-    return swimmers
-  
-  def swimmer_fastest_time_to_db(self, swimmer_id, events):
-    event_str = self.event_delim.join([f'{event.event_name}{self.event_time_delim}{event.time}' for event in events])
-    if not event_str: return
-    conn = self._get_db_connection()
-    cur = conn.cursor()
-    cur.execute("DELETE FROM swimmers WHERE id = ?", (swimmer_id,))
-    cur.execute("INSERT INTO swimmers (id, fastest_time) VALUES (?, ?)", (swimmer_id, event_str))
-    conn.commit()
-    conn.close()
-
-  def _get_db_connection(self):
-    conn = sqlite3.connect(self.sqldb_file)
-    conn.row_factory = sqlite3.Row
-    ensure_swimmers_table(conn)
-    return conn
 
 # A score board is to represent one timestand and optional national time and muliple swimmers.
 class ScoreBoard:
@@ -333,7 +274,7 @@ class ScoreBoard:
     self.swimmers = []
     self.time_standard = time_standard
     self.national_time = national_time
-    self.event_store = EventStore('swimmers.db')
+    self.event_fetcher = EventFetcher()
 
   def add_time_standards(self):
     self.board.append(times_map[self.time_standard])
@@ -341,7 +282,7 @@ class ScoreBoard:
 
   def add_swimmer(self, swimmer_id):
     column = {}
-    events, gender, age = self.event_store.swimmer_fastest_time(swimmer_id, use_cache=False)
+    events, gender, age = self.event_fetcher.swimmer_fastest_time(swimmer_id)
     for event in events:
       column[event.event_name] = event.time
     self.board.append(column)
@@ -402,7 +343,7 @@ class ScoreCard:
     self.swimmer = swimmer
     self.swimmers = []
     self.national_time = nationaltime
-    self.event_store = EventStore('swimmers.db')
+    self.event_fetcher = EventFetcher()
     self.gender = 'Male'
     self.age = 10
     # the first column is swimmmer, the next columns are time standards.
@@ -413,7 +354,7 @@ class ScoreCard:
     if not self.swimmer: return
     self.swimmers.append(self.swimmer)
     column = {}
-    events, gender, age = self.event_store.swimmer_fastest_time(self.swimmer, use_cache=False)
+    events, gender, age = self.event_fetcher.swimmer_fastest_time(self.swimmer)
     if gender is not None:
       self.gender = gender
     if age is not None:

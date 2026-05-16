@@ -1,42 +1,20 @@
-from datetime import timedelta
-from flask import Blueprint, Flask, render_template, request, session, redirect, url_for, after_this_request
-from flask_sqlalchemy import SQLAlchemy
+from flask import Flask, render_template, request, session, redirect, url_for, after_this_request
 from flask_wtf import FlaskForm
-from utils import ScoreBoard, ScoreCard, ensure_swimmers_table
+from utils import ScoreBoard, ScoreCard
 from wtforms import SelectField, TextAreaField
 from times import times_name_pair, national_times_name_pair, national_timemap
-from data.schema import db, SwimmerProfile
+
+
 
 import json
 import logging
-import requests
 import os
-import sqlite3
+import requests
 import urllib.parse
 
 
-basedir = os.path.abspath(os.path.dirname(__file__))
-main = Blueprint("main", __name__)
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY') or 'you-will-never-guess'  # this need to be top-level, otherwise server will throw error: RuntimeError: A secret key is required to use CSRF.
-
-
-def create_app():    
-    app.config['PERMANENT_SESSION_LIFETIME'] =  timedelta(minutes=5)
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'data', 'swimmer-profile.db')
-    app.config["SQLALCHEMY_ECHO"] = True
-    app.config["SQLALCHEMY_RECORD_QUERIES"] = True
-    if main.name not in app.blueprints:
-      app.register_blueprint(main)
-
-    with app.app_context():
-      if "sqlalchemy" not in app.extensions:
-        db.init_app(app)
-
-    return app
-
-
-create_app()
 
 
 @app.context_processor
@@ -63,6 +41,56 @@ def utility_processor_national_time_tool_tip():
             res += f'{standard}:\u00A0{time}\u000A'
       return res.strip()
     return dict(national_time_tool_tip=national_time_tool_tip)
+
+
+@app.route('/board', methods=('GET', 'POST'))
+def board(format='records+nationaltime'):
+  timestandard = request.args.get('ts') or session.get('ts') or 'JO-10-MALE'
+  nationaltime = request.args.get('nt') or session.get('nt') or ''
+  season = request.args.get('season') or session.get('season') or ''
+  if nationaltime == '': format = 'records'
+  
+  logging.debug(f'request.method={request.method}')
+  logging.debug(f'timestandard={timestandard}')
+  logging.debug(f'nationaltime={nationaltime}')
+  logging.debug(f'format={format}')
+
+  sb = ScoreBoard(time_standard=timestandard, national_time=nationaltime)
+  sb.add_time_standards()
+  swimmer_param = request.args.get('id') or session.get('swimmers')
+  if swimmer_param:
+    for swimmer_id in swimmer_param.split(','):
+      sb.add_swimmer(swimmer_id)
+  if format in ('records', 'records+nationaltime'):
+    records, rownames, colnames = sb.gen_report(format=format)
+  elif format == 'dataframe':
+    df = sb.gen_report(format=format)
+    records = df.to_dict(orient='records')
+    rownames = df.index.values
+    colnames = df.columns.values
+  else:
+    raise Exception(f'format {format} is not supported')
+  logging.debug(f'records size={len(records)}, rownames size={len(rownames)}, colnames size={len(colnames)}')
+
+  if request.method == 'POST':
+    session['ts'] = request.form.get('timestandard','JO-10-MALE')
+    session['nt'] = request.form.get('nationaltime','')
+    session['swimmers'] = request.form['hidden_swimmers']
+    session['season'] = request.form.get('season','')
+    if len(request.form['more_swimmers']) and len(request.form['more_swimmers'].split(',')) >= 1:
+       session['swimmers'] += (',' if session['swimmers'] else '') + request.form['more_swimmers']
+    logging.debug(f'request.arg: {request.args}')
+    logging.debug(f"session[ts]:{session['ts']}")
+    logging.debug(f"session[swimmers]:{session['swimmers']}")
+    return redirect(url_for('board', **request.args))
+  else:
+    @after_this_request
+    def do_sth_after(response):
+       logging.debug('Finished. response:{response}')
+       return response
+
+    return render_template('board.html', season=season, nationaltime=nationaltime, national_timemap=national_timemap,
+                           records=records, rownames=rownames, colnames=colnames)
 
 
 @app.route('/card', methods=('GET', 'POST'))
@@ -106,21 +134,6 @@ class ScoreCardForm(FlaskForm):
 def index():
     return render_template("search.html")
 
-
-@app.route('/search_results_from_db')
-def search_db():
-    q = request.args.get("q")
-    logging.debug(f'q={q}')
-    
-    results = set()
-    keys = q.strip().split()
-    
-    for key in keys:
-        matches = SwimmerProfile.query.filter(SwimmerProfile.firstname.icontains(key) | SwimmerProfile.lastname.icontains(key) | SwimmerProfile.team.icontains(key))
-        for match in matches:
-            results.add(match)
-    return render_template("search_results_from_db.html", results=sorted(results))
-
   
 @app.route("/search_results_from_api")
 def search_api():
@@ -159,20 +172,6 @@ def swimmer_selector():
   response = requests.get(url, headers=headers)
   entries = json.loads(response.content)['data']
   return render_template("search_results_from_api.html", results=entries, format=format)
-
-
-@app.route('/cache/')
-@app.route('/cachedb/')
-@app.route('/dbcache/')
-@app.route('/db/')
-@app.route('/testdb/')
-def testdb():
-  conn = sqlite3.connect('swimmers.db')
-  ensure_swimmers_table(conn)
-  conn.row_factory = sqlite3.Row
-  swimmers = conn.execute('SELECT * FROM swimmers').fetchall()
-  conn.close()
-  return render_template('testdb.html', swimmers=swimmers)
 
 
 if  __name__ == '__main__':

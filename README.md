@@ -47,8 +47,6 @@
      - cd to root folder
      - run `python -m data.crawl_swimmer_py and save the results to `swimmers.py`
 
-5.  Add swimmer profile to .csv file and database.
+5.  Add swimmer profiles to the local CSV file.
     - cd to root folder
     - run `python -m data.crawl_swimmer_csv` to update `swimmer-profile-top1000-per-group.csv`
-    - run `python -m data.build_swimmer_profile_db` to update `swimmer-profile.db`
-

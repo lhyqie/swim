@@ -12,23 +12,13 @@ print('----------------------------------------------------')
 for event in to_fastest(all_events):
   print(event)
 
-# -------------------- Test EventStore --------------------------
-# from utils import EventStore
-# event_store = EventStore(sqldb_file='swimmers_test.db')
-# for row in event_store.swimmer_fastest_time_from_db('abby-chan'):
-#   print(row['id'], row['fastest_time'])
-# print(event_store.swimmer_fastest_time_from_db('unknown-swimmer'))
-# print()
-# for event in event_store.swimmer_fastest_time('abby-chan', use_cache=True):
-#   print(event)
-# print()
-# for event in event_store.swimmer_fastest_time('abby-chan', use_cache=False):
-#   print(event)
-# // Test update swimmer fastest times to db.
-# events = event_store.swimmer_fastest_time('abby-chan', use_cache=False)
+# -------------------- Test EventFetcher --------------------------
+# from utils import EventFetcher
+# event_fetcher = EventFetcher()
+# events, gender, age = event_fetcher.swimmer_fastest_time('abby-chan')
+# print(gender, age)
 # for event in events:
 #   print(event)
-# event_store.swimmer_fastest_time_to_db('abby-chan', events)
 
 # -------------------- Test ScoreBoard --------------------------
 # from utils import ScoreBoard
@@ -77,9 +67,6 @@ for event in to_fastest(all_events):
 
 # import wtforms
 # print(wtforms.__version__)
-
-# import sqlite3
-# print(sqlite3.version)
 
 # from datetime import datetime
 # date = datetime.strptime('2024-03-10 08:20:20','%Y-%m-%d %H:%M:%S')
