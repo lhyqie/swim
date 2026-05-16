@@ -170,5 +170,5 @@ def extract_fw(pdf_path):
 
 
 if __name__ == '__main__':
-  jobj = extract_fw(pdf_path='data/download-fw-time.pdf')
+  jobj = extract_fw(pdf_path='data/timestandards/download-fw-time.pdf')
   print(json.dumps(jobj, indent=2))

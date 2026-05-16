@@ -169,5 +169,5 @@ def extract_national(pdf_path):
   return jobj
 
 if __name__ == '__main__':
-  jobj = extract_national("data/download-national-time.pdf")
+  jobj = extract_national("data/timestandards/download-national-time.pdf")
   print(json.dumps(jobj, indent=2))

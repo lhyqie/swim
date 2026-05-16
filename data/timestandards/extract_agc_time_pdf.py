@@ -147,5 +147,5 @@ def extract_agc(pdf_path):
 
 
 if __name__ == '__main__':
-  jobj = extract_agc(pdf_path='data/download-agc-time.pdf')
+  jobj = extract_agc(pdf_path='data/timestandards/download-agc-time.pdf')
   print(json.dumps(jobj, indent=2))

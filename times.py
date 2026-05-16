@@ -18,8 +18,8 @@ times_name_pair = [
   ("FW-13-14-FEMALE",   "Women 13-14 \u00A0\u00A0\u00A0\u00A0\u00A0 Far Western"),
 ]
 
-# exported from data/extract_agc_time_pdf.py
 times_map = {
+  # exported from data/timestandards/extract_agc_time_pdf.py
   "JO-10-FEMALE": {
     "25 Y Free": "",
     "50 Y Free": "31.39",
@@ -430,6 +430,7 @@ times_map = {
     "200 M IM": "2:28.49",
     "400 M IM": "5:28.39"
   },
+  # exported from data/timestandards/extract_fw_time_pdf.py
   "FW-10-FEMALE": {
     "25 Y Free": "",
     "50 Y Free": "30.59",
@@ -723,7 +724,7 @@ def time_name_fits_age_gender(time_name, age, gender):
   }
   return time_name in ageGender2TimeStandardAllowList[(age, gender)]  
 
-# exported from data/extract_national_time_pdf.py
+# exported from data/timestandards/extract_national_time_pdf.py
 national_timemap = {
   "10-FEMALE": {
     "AAAA": {
