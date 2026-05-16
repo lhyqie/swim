@@ -2,19 +2,17 @@ from flask import Flask, render_template, request, session, redirect, url_for, a
 from flask_wtf import FlaskForm
 from utils import ScoreBoard, ScoreCard
 from wtforms import SelectField, TextAreaField
+from data.swim_standards_data_provider import SwimStandardsDataProvider
 from times import times_name_pair, national_times_name_pair, national_timemap
 
 
-
-import json
 import logging
 import os
-import requests
-import urllib.parse
 
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY') or 'you-will-never-guess'  # this need to be top-level, otherwise server will throw error: RuntimeError: A secret key is required to use CSRF.
+swim_standards_data_provider = SwimStandardsDataProvider()
 
 
 @app.context_processor
@@ -137,17 +135,9 @@ def index():
   
 @app.route("/search_results_from_api")
 def search_api():
-    q = request.args.get("q")
-    q = urllib.parse.quote(q)
+    q = request.args.get("q", "")
     logging.debug(f'q={q}')
-    # url = f'https://api.swimstandards.com/swimmers?$search={q}&lsc=&$limit=10&$skip=0'
-    url = f'https://swimstandards.com/dnxapi/swimmers?$search={q}&lsc=&$limit=20&$skip=0'
-    logging.debug(f'fetch result from API via {url}')
-    headers = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-    }
-    response = requests.get(url, headers=headers)
-    entries = json.loads(response.content)['data']
+    entries = swim_standards_data_provider.search_swimmers(q)
     return render_template("search_results_from_api.html", results=entries)
 
 
@@ -159,18 +149,10 @@ def form3():
 
 @app.route('/swimmer_selector')
 def swimmer_selector():
-  q = request.args.get("q")
+  q = request.args.get("q", "")
   format = request.args.get("format")
-  q = urllib.parse.quote(q)
   logging.debug(f'q={q}, format={format}')
-  # url = f'https://api.swimstandards.com/swimmers?$search={q}&lsc=&$limit=10&$skip=0'
-  url = f'https://swimstandards.com/dnxapi/swimmers?$search={q}&lsc=&$limit=20&$skip=0'
-  logging.debug(f'fetch result from API via {url}')
-  headers = {
-    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-  }
-  response = requests.get(url, headers=headers)
-  entries = json.loads(response.content)['data']
+  entries = swim_standards_data_provider.search_swimmers(q)
   return render_template("search_results_from_api.html", results=entries, format=format)
 
 
