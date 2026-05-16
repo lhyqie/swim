@@ -4,7 +4,6 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import FlaskForm
 from utils import ScoreBoard, ScoreCard, ensure_swimmers_table
 from wtforms import SelectField, TextAreaField
-from swimmers import predefined_swimmers
 from times import times_name_pair, national_times_name_pair, national_timemap
 from data.schema import db, SwimmerProfile
 
@@ -66,56 +65,6 @@ def utility_processor_national_time_tool_tip():
     return dict(national_time_tool_tip=national_time_tool_tip)
 
 
-@app.route('/board', methods=('GET', 'POST'))
-def board(format='records+nationaltime'):
-  timestandard = request.args.get('ts') or session.get('ts') or 'JO-10-MALE'
-  nationaltime = request.args.get('nt') or session.get('nt') or ''
-  season = request.args.get('season') or session.get('season') or ''
-  if nationaltime == '': format = 'records'
-  
-  logging.debug(f'request.method={request.method}')
-  logging.debug(f'timestandard={timestandard}')
-  logging.debug(f'nationaltime={nationaltime}')
-  logging.debug(f'format={format}')
-
-  sb = ScoreBoard(time_standard=timestandard, national_time=nationaltime)
-  sb.add_time_standards()
-  swimmer_param = request.args.get('id') or session.get('swimmers')
-  if swimmer_param:
-    for swimmer_id in swimmer_param.split(','):
-      sb.add_swimmer(swimmer_id)
-  if format in ('records', 'records+nationaltime'):
-    records, rownames, colnames = sb.gen_report(format=format)
-  elif format == 'dataframe':
-    df = sb.gen_report(format=format)
-    records = df.to_dict(orient='records')
-    rownames = df.index.values
-    colnames = df.columns.values
-  else:
-    raise Exception(f'format {format} is not supported')
-  logging.debug(f'records size={len(records)}, rownames size={len(rownames)}, colnames size={len(colnames)}')
-
-  if request.method == 'POST':
-    session['ts'] = request.form.get('timestandard','JO-10-MALE')
-    session['nt'] = request.form.get('nationaltime','')
-    session['swimmers'] = request.form['hidden_swimmers']
-    session['season'] = request.form.get('season','')
-    if len(request.form['more_swimmers']) and len(request.form['more_swimmers'].split(',')) >= 1:
-       session['swimmers'] += (',' if session['swimmers'] else '') + request.form['more_swimmers']
-    logging.debug(f'request.arg: {request.args}')
-    logging.debug(f"session[ts]:{session['ts']}")
-    logging.debug(f"session[swimmers]:{session['swimmers']}")
-    return redirect(url_for('board', **request.args))
-  else:
-    @after_this_request
-    def do_sth_after(response):
-       logging.debug('Finished. response:{response}')
-       return response
-
-    return render_template('board.html', season=season, nationaltime=nationaltime, national_timemap=national_timemap,
-                           records=records, rownames=rownames, colnames=colnames, form=form)
-
-
 @app.route('/card', methods=('GET', 'POST'))
 def card():
   if request.method == 'POST':
@@ -139,7 +88,7 @@ def card():
   records, rownames, colnames = sc.gen_report()
   logging.debug(f'records size={len(records)}, rownames size={len(rownames)}, colnames size={len(colnames)}')  
   return render_template('card.html', season=season, nationaltime=sc.national_time, national_timemap=national_timemap,
-                         records=records, rownames=rownames, colnames=colnames, form=form)
+                         records=records, rownames=rownames, colnames=colnames)
 
 
 class ScoreBoardForm(FlaskForm):
@@ -189,23 +138,10 @@ def search_api():
     return render_template("search_results_from_api.html", results=entries)
 
 
-@app.route('/compare/', methods=('GET', 'POST'))
-@app.route('/select/', methods=('GET', 'POST'))
-def form():
-  form = ScoreBoardForm()
-  return render_template('form.html', predefined_swimmers=predefined_swimmers, form=form)
-
-
-@app.route('/swim/', methods=('GET', 'POST'))
-def form2():
-  form = ScoreCardForm()
-  return render_template('form2.html', predefined_swimmers=predefined_swimmers, form=form)
-
-
 @app.route('/swimmer/', methods=('GET', 'POST'))
 def form3():
   form = ScoreBoardForm()
-  return render_template('form3.html', predefined_swimmers=predefined_swimmers, form=form)
+  return render_template('form3.html', form=form)
 
 
 @app.route('/swimmer_selector')
