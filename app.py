@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, session, redirect, url_for, a
 from flask_wtf import FlaskForm
 from utils import ScoreBoard, ScoreCard
 from wtforms import SelectField, TextAreaField
-from data.swim_standards_data_provider import SwimStandardsDataProvider
+from data.swimmer_data_provider import AjzxHubDataProvider
 from times import times_name_pair, national_times_name_pair, national_timemap
 
 
@@ -12,7 +12,7 @@ import os
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY') or 'you-will-never-guess'  # this need to be top-level, otherwise server will throw error: RuntimeError: A secret key is required to use CSRF.
-data_provider = SwimStandardsDataProvider()
+data_provider = AjzxHubDataProvider()
 
 
 @app.context_processor
