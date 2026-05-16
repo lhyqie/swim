@@ -1,11 +1,21 @@
 from abc import ABC, abstractmethod
+from dataclasses import dataclass
 
 import requests
 
 
+@dataclass(frozen=True)
+class SwimmerProfile:
+  slug: str
+  name: str
+  sex: str
+  age: int
+  team: str
+
+
 class SwimmerSearchDataProvider(ABC):
   @abstractmethod
-  def search_swimmers(self, query, limit=20, skip=0):
+  def search_swimmers(self, query, limit=20, skip=0) -> list[SwimmerProfile]:
     pass
 
 
@@ -21,7 +31,7 @@ class SwimStandardsDataProvider(SwimmerSearchDataProvider):
   def __init__(self, session=None):
     self.session = session or requests
 
-  def search_swimmers(self, query, limit=20, skip=0):
+  def search_swimmers(self, query, limit=20, skip=0) -> list[SwimmerProfile]:
     query = (query or "").strip()
     if not query:
       return []
@@ -37,4 +47,13 @@ class SwimStandardsDataProvider(SwimmerSearchDataProvider):
       headers=self.HEADERS,
     )
     response.raise_for_status()
-    return response.json().get("data", [])
+    return [
+      SwimmerProfile(
+        slug=entry.get("slug", ""),
+        name=entry.get("name", ""),
+        sex=entry.get("sex", ""),
+        age=entry.get("age", 0),
+        team=entry.get("team") or entry.get("swimTeam", ""),
+      )
+      for entry in response.json().get("data", [])
+    ]

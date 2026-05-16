@@ -12,7 +12,7 @@ import os
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY') or 'you-will-never-guess'  # this need to be top-level, otherwise server will throw error: RuntimeError: A secret key is required to use CSRF.
-swim_standards_data_provider = SwimStandardsDataProvider()
+data_provider = SwimStandardsDataProvider()
 
 
 @app.context_processor
@@ -137,7 +137,7 @@ def index():
 def search_api():
     q = request.args.get("q", "")
     logging.debug(f'q={q}')
-    entries = swim_standards_data_provider.search_swimmers(q)
+    entries = data_provider.search_swimmers(q)
     return render_template("search_results_from_api.html", results=entries)
 
 
@@ -152,7 +152,7 @@ def swimmer_selector():
   q = request.args.get("q", "")
   format = request.args.get("format")
   logging.debug(f'q={q}, format={format}')
-  entries = swim_standards_data_provider.search_swimmers(q)
+  entries = data_provider.search_swimmers(q)
   return render_template("search_results_from_api.html", results=entries, format=format)
 
 
