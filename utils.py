@@ -9,6 +9,17 @@ from times import national_timemap,times_map,times_name_pair,time_name_fits_age_
 from typing import List
 
 
+def ensure_swimmers_table(conn):
+  conn.execute("""
+    CREATE TABLE IF NOT EXISTS swimmers (
+      id TEXT PRIMARY KEY,
+      fastest_time TEXT NOT NULL,
+      crawl_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    )
+  """)
+  conn.commit()
+
+
 class Event:
   def __init__(self, entry):
     self.swimmer_name = entry['name']
@@ -295,7 +306,7 @@ class EventStore:
 
   def swimmer_fastest_time_from_db(self, swimmer_id):
     conn = self._get_db_connection()
-    swimmers = conn.execute(f'SELECT * FROM swimmers WHERE id="{swimmer_id}"').fetchall()
+    swimmers = conn.execute('SELECT * FROM swimmers WHERE id = ?', (swimmer_id,)).fetchall()
     conn.close()
     return swimmers
   
@@ -304,14 +315,15 @@ class EventStore:
     if not event_str: return
     conn = self._get_db_connection()
     cur = conn.cursor()
-    cur.execute(f"DELETE FROM swimmers WHERE id='{swimmer_id}'")
-    cur.execute(f"INSERT INTO swimmers (id, fastest_time) VALUES ('{swimmer_id}', '{event_str}')")
+    cur.execute("DELETE FROM swimmers WHERE id = ?", (swimmer_id,))
+    cur.execute("INSERT INTO swimmers (id, fastest_time) VALUES (?, ?)", (swimmer_id, event_str))
     conn.commit()
     conn.close()
 
   def _get_db_connection(self):
     conn = sqlite3.connect(self.sqldb_file)
     conn.row_factory = sqlite3.Row
+    ensure_swimmers_table(conn)
     return conn
 
 # A score board is to represent one timestand and optional national time and muliple swimmers.

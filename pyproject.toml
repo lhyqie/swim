@@ -1,0 +1,15 @@
+[project]
+name = "swim"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "bs4",
+    "curl_cffi",
+    "flask==3.0.2",
+    "flask-sqlalchemy==3.0.5",
+    "flask_wtf==1.2.1",
+    "requests==2.27.1",
+    "wtforms==3.1.2",
+]

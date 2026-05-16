@@ -2,7 +2,7 @@ from datetime import timedelta
 from flask import Blueprint, Flask, render_template, request, session, redirect, url_for, after_this_request
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import FlaskForm
-from utils import ScoreBoard, ScoreCard
+from utils import ScoreBoard, ScoreCard, ensure_swimmers_table
 from wtforms import SelectField, TextAreaField
 from swimmers import predefined_swimmers
 from times import times_name_pair, national_times_name_pair, national_timemap
@@ -27,10 +27,17 @@ def create_app():
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'data', 'swimmer-profile.db')
     app.config["SQLALCHEMY_ECHO"] = True
     app.config["SQLALCHEMY_RECORD_QUERIES"] = True
-    app.register_blueprint(main)
+    if main.name not in app.blueprints:
+      app.register_blueprint(main)
 
     with app.app_context():
-      db.init_app(app)    
+      if "sqlalchemy" not in app.extensions:
+        db.init_app(app)
+
+    return app
+
+
+create_app()
 
 
 @app.context_processor
@@ -225,6 +232,7 @@ def swimmer_selector():
 @app.route('/testdb/')
 def testdb():
   conn = sqlite3.connect('swimmers.db')
+  ensure_swimmers_table(conn)
   conn.row_factory = sqlite3.Row
   swimmers = conn.execute('SELECT * FROM swimmers').fetchall()
   conn.close()
@@ -238,5 +246,4 @@ if  __name__ == '__main__':
     logging.basicConfig(format='%(asctime)s %(levelname)-8s %(message)s', 
                         level=logging.DEBUG, datefmt='%Y-%m-%d %H:%M:%S')
   
-  create_app()
   app.run(debug=debug, port=port)
