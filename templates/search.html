@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" crossorigin="anonymous">
   <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='table.css') }}">
   <script src="https://unpkg.com/htmx.org@1.9.4"></script>
+  <script src="{{ url_for('static', filename='favorites.js') }}"></script>
 </head>
 <body class="score-page discovery-page">
   <main class="score-shell discovery-shell">
@@ -37,6 +38,13 @@
       <img width="42" id="spinner" class="htmx-indicator loader" src="{{ url_for('static',filename='infinite-spinner.svg') }}" />
     </section>
 
+    <section class="favorite-panel search-favorites-panel">
+      <div class="favorite-panel-heading">Favorite Swimmers</div>
+      <div class="favorite-list" id="search_favorite_list">
+        <div class="favorite-empty">No favorite swimmers saved yet.</div>
+      </div>
+    </section>
+
     <div class="results-wrap">
       <table class="results-table" id="tableOne">
         <thead>
@@ -56,5 +64,64 @@
       </table>
     </div>
   </main>
+  <script>
+    function removeSearchFavorite(button) {
+      if (window.SwimFavorites) {
+        window.SwimFavorites.removeFavorite(button.dataset.favoriteId);
+      }
+    }
+
+    function renderSearchFavorites() {
+      var list = document.getElementById("search_favorite_list");
+      var favorites = window.SwimFavorites ? window.SwimFavorites.getFavorites() : [];
+      list.innerHTML = "";
+      if (favorites.length == 0) {
+        var emptyState = document.createElement("div");
+        emptyState.className = "favorite-empty";
+        emptyState.textContent = "No favorite swimmers saved yet.";
+        list.appendChild(emptyState);
+        return;
+      }
+
+      favorites.forEach(function(favorite) {
+        var item = document.createElement("div");
+        item.className = "favorite-item";
+
+        var summary = document.createElement("div");
+        summary.className = "favorite-summary";
+        var name = document.createElement("div");
+        name.className = "favorite-name";
+        name.textContent = favorite.name;
+        var meta = document.createElement("div");
+        meta.className = "favorite-meta";
+        meta.textContent = window.SwimFavorites.favoriteMeta(favorite) || favorite.id;
+        summary.appendChild(name);
+        summary.appendChild(meta);
+
+        var actions = document.createElement("div");
+        actions.className = "favorite-actions";
+        var openLink = document.createElement("a");
+        openLink.className = "score-button score-button-success score-button-compact";
+        openLink.href = "/card?id=" + encodeURIComponent(favorite.id);
+        openLink.textContent = "Open";
+        var removeButton = document.createElement("button");
+        removeButton.type = "button";
+        removeButton.className = "score-button score-button-danger score-button-compact";
+        removeButton.textContent = "Remove";
+        removeButton.dataset.favoriteId = favorite.id;
+        removeButton.onclick = function() { removeSearchFavorite(removeButton); };
+        actions.appendChild(openLink);
+        actions.appendChild(removeButton);
+
+        item.appendChild(summary);
+        item.appendChild(actions);
+        list.appendChild(item);
+      });
+    }
+
+    document.addEventListener("DOMContentLoaded", renderSearchFavorites);
+    document.addEventListener("swim:favorites-changed", renderSearchFavorites);
+    window.addEventListener("focus", renderSearchFavorites);
+  </script>
 </body>
 </html>

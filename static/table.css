@@ -591,6 +591,25 @@ body.score-card-page #swimmers tbody tr:hover > td:nth-child(2) {
   text-decoration: underline;
 }
 
+.result-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.favorite-button.is-favorite {
+  border-color: #f59e0b;
+  background: #fffbeb;
+  color: #92400e;
+}
+
+.favorite-button.is-favorite:hover,
+.favorite-button.is-favorite:focus {
+  background: #fef3c7;
+  color: #78350f;
+}
+
 .result-id,
 .selected-meta {
   display: block;
@@ -623,6 +642,68 @@ body.score-card-page #swimmers tbody tr:hover > td:nth-child(2) {
 
 .compare-picker .discovery-search {
   flex: 0 0 auto;
+}
+
+.favorite-panel {
+  display: grid;
+  gap: 8px;
+  padding-top: 2px;
+}
+
+.favorite-panel-heading {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.favorite-list {
+  display: grid;
+  gap: 8px;
+}
+
+.search-favorites-panel {
+  margin-bottom: 16px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.86);
+  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.08);
+}
+
+.search-favorites-panel .favorite-list {
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
+.favorite-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface-soft);
+}
+
+.favorite-name {
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.favorite-meta,
+.favorite-empty {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.favorite-actions {
+  display: flex;
+  gap: 6px;
 }
 
 .selected-panel {
@@ -785,6 +866,14 @@ body.score-card-page #swimmers tbody tr:hover > td:nth-child(2) {
     min-height: 44px;
   }
 
+  .favorite-item {
+    grid-template-columns: 1fr;
+  }
+
+  .favorite-actions .score-button {
+    flex: 1 1 0;
+  }
+
   .table-container {
     width: calc(100% + 20px);
     max-height: calc(100vh - 240px);
@@ -922,8 +1011,13 @@ body.score-card-page #swimmers tbody tr:hover > td:nth-child(2) {
     background: transparent;
   }
 
-  .results-table td:last-child .score-button {
+  .result-actions {
+    grid-column: 2;
     width: 100%;
+  }
+
+  .result-actions .score-button {
+    flex: 1 1 88px;
   }
 
   .results-table .empty-row td {

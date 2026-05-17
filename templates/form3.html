@@ -5,6 +5,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='table.css') }}">
     <script src="https://unpkg.com/htmx.org@1.9.4"></script>
+    <script src="{{ url_for('static', filename='favorites.js') }}"></script>
     <meta name="robots" content="noindex, nofollow" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
   </head>
@@ -43,6 +44,12 @@
             </select>
           </label>
           <button type="button" class="score-button score-button-success" onclick="addRow()">Add Swimmer</button>
+          <div class="favorite-panel">
+            <div class="favorite-panel-heading">Favorite Swimmers</div>
+            <div class="favorite-list" id="favorite_list">
+              <div class="favorite-empty">No favorite swimmers saved yet.</div>
+            </div>
+          </div>
         </div>
 
         <div class="selected-panel">
@@ -85,15 +92,7 @@
       var emptyRow = document.getElementById("selected_empty");
       var tableData = [];
 
-      function addRow() {
-        var selector = document.getElementById("swimmer_selector");
-        var selected = selector.options[selector.selectedIndex];
-        if (!selected || selected.value == "unset") {
-          alert("First search swimmer, then select from the list.");
-          return;
-        }
-
-        var swimmerId = selected.value;
+      function addSelectedSwimmer(swimmerId, swimmerName, swimmerMeta, swimmerTeam) {
         for (let k = 0; k < tableData.length; k++) {
           if (tableData[k][0] == swimmerId) {
             alert("Swimmer is already selected.");
@@ -106,9 +105,6 @@
           emptyRow = null;
         }
 
-        var swimmerName = selected.dataset.name || selected.textContent.trim();
-        var swimmerMeta = selected.dataset.meta || "";
-        var swimmerTeam = selected.dataset.team || "";
         var rowData = [swimmerId, swimmerName];
         var row = document.createElement("tr");
 
@@ -140,6 +136,105 @@
 
         tableBody.appendChild(row);
         tableData.push(rowData);
+      }
+
+      function selectedOptionData(selectorId) {
+        var selector = document.getElementById(selectorId);
+        var selected = selector.options[selector.selectedIndex];
+        if (!selected || selected.value == "unset") {
+          return null;
+        }
+        return {
+          id: selected.value,
+          name: selected.dataset.name || selected.textContent.trim(),
+          meta: selected.dataset.meta || "",
+          team: selected.dataset.team || ""
+        };
+      }
+
+      function addRow() {
+        var selected = selectedOptionData("swimmer_selector");
+        if (!selected) {
+          alert("First search swimmer, then select from the list.");
+          return;
+        }
+        addSelectedSwimmer(selected.id, selected.name, selected.meta, selected.team);
+      }
+
+      function favoriteButtonData(button) {
+        return {
+          id: button.dataset.favoriteId || "",
+          name: button.dataset.favoriteName || button.dataset.favoriteId || "",
+          meta: button.dataset.favoriteMeta || "",
+          team: button.dataset.favoriteTeam || ""
+        };
+      }
+
+      function addFavoriteFromButton(button) {
+        var favorite = favoriteButtonData(button);
+        if (!favorite.id) {
+          return;
+        }
+        addSelectedSwimmer(favorite.id, favorite.name, favorite.meta, favorite.team);
+      }
+
+      function removeFavoriteFromButton(button) {
+        if (window.SwimFavorites) {
+          window.SwimFavorites.removeFavorite(button.dataset.favoriteId);
+        }
+      }
+
+      function renderFavoriteList() {
+        var list = document.getElementById("favorite_list");
+        var favorites = window.SwimFavorites ? window.SwimFavorites.getFavorites() : [];
+        list.innerHTML = "";
+        if (favorites.length == 0) {
+          var emptyState = document.createElement("div");
+          emptyState.className = "favorite-empty";
+          emptyState.textContent = "No favorite swimmers saved yet.";
+          list.appendChild(emptyState);
+          return;
+        }
+
+        favorites.forEach(function(favorite) {
+          var item = document.createElement("div");
+          item.className = "favorite-item";
+
+          var summary = document.createElement("div");
+          summary.className = "favorite-summary";
+          var name = document.createElement("div");
+          name.className = "favorite-name";
+          name.textContent = favorite.name;
+          var meta = document.createElement("div");
+          meta.className = "favorite-meta";
+          meta.textContent = window.SwimFavorites.favoriteMeta(favorite) || favorite.id;
+          summary.appendChild(name);
+          summary.appendChild(meta);
+
+          var actions = document.createElement("div");
+          actions.className = "favorite-actions";
+          var addButton = document.createElement("button");
+          addButton.type = "button";
+          addButton.className = "score-button score-button-success score-button-compact";
+          addButton.textContent = "Add";
+          addButton.dataset.favoriteId = favorite.id;
+          addButton.dataset.favoriteName = favorite.name;
+          addButton.dataset.favoriteMeta = [favorite.sex, favorite.age].filter(Boolean).join(" - ");
+          addButton.dataset.favoriteTeam = favorite.team;
+          addButton.onclick = function() { addFavoriteFromButton(addButton); };
+          var removeButton = document.createElement("button");
+          removeButton.type = "button";
+          removeButton.className = "score-button score-button-danger score-button-compact";
+          removeButton.textContent = "Remove";
+          removeButton.dataset.favoriteId = favorite.id;
+          removeButton.onclick = function() { removeFavoriteFromButton(removeButton); };
+          actions.appendChild(addButton);
+          actions.appendChild(removeButton);
+
+          item.appendChild(summary);
+          item.appendChild(actions);
+          list.appendChild(item);
+        });
       }
 
       function deleteRow(row) {
@@ -175,6 +270,10 @@
         }
         window.location.href = url;
       }
+
+      document.addEventListener("DOMContentLoaded", renderFavoriteList);
+      document.addEventListener("swim:favorites-changed", renderFavoriteList);
+      window.addEventListener("focus", renderFavoriteList);
     </script>
   </body>
 </html>

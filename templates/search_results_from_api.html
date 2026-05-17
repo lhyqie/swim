@@ -22,7 +22,21 @@
         <td data-label="Team">{{ result.team }}</td>
         <td data-label="Age">{{ result.age }}</td>
         <td data-label="Sex">{{ result.sex }}</td>
-        <td><a class="score-button score-button-muted score-button-compact" href="/card?id={{ result.slug }}">Open</a></td>
+        <td data-label="Actions">
+          <div class="result-actions">
+            <button
+              type="button"
+              class="score-button score-button-muted score-button-compact favorite-button"
+              data-favorite-id="{{ result.slug }}"
+              data-favorite-name="{{ result.name }}"
+              data-favorite-team="{{ result.team }}"
+              data-favorite-age="{{ result.age }}"
+              data-favorite-sex="{{ result.sex }}"
+              aria-pressed="false"
+              onclick="toggleFavoriteFromButton(this)">Save</button>
+            <a class="score-button score-button-muted score-button-compact" href="/card?id={{ result.slug }}">Open</a>
+          </div>
+        </td>
     </tr>
     {% else %}
     <tr class="empty-row">
