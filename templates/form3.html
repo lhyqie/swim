@@ -113,10 +113,12 @@
         var row = document.createElement("tr");
 
         var idCell = document.createElement("td");
+        idCell.dataset.label = "ID";
         idCell.innerHTML = swimmerId;
         row.appendChild(idCell);
 
         var nameCell = document.createElement("td");
+        nameCell.dataset.label = "Swimmer";
         var nameSpan = document.createElement("span");
         nameSpan.className = "selected-name";
         nameSpan.textContent = swimmerName;

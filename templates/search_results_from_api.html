@@ -15,13 +15,13 @@
 
     {% for result in results %}
     <tr>
-        <td>
+        <td data-label="Swimmer">
           <a class="result-name" href="/card?id={{ result.slug }}">{{ result.name }}</a>
           <div class="result-id">{{ result.slug }}</div>
         </td>
-        <td>{{ result.team }}</td>
-        <td>{{ result.age }}</td>
-        <td>{{ result.sex }}</td>
+        <td data-label="Team">{{ result.team }}</td>
+        <td data-label="Age">{{ result.age }}</td>
+        <td data-label="Sex">{{ result.sex }}</td>
         <td><a class="score-button score-button-muted score-button-compact" href="/card?id={{ result.slug }}">Open</a></td>
     </tr>
     {% else %}

@@ -2,6 +2,7 @@
 <html>
 <head>
 <title>Swimmer and Time Standards ScoreCard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" crossorigin="anonymous">
 <link rel="stylesheet" type= "text/css" href= "{{ url_for('static',filename='table.css') }}">
 <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
@@ -18,7 +19,7 @@
   </div>
   <nav class="score-actions">
     <a href="/search" id="tosearch" class="score-button score-button-primary">Single Swimmer</a>
-    <a href="/swimmer/" id="tocompare" class="score-button score-button-success">Multiple Swimmers</a>
+    <a href="/swimmer/" id="tocompare" class="score-button score-button-success">Compare Swimmers</a>
     <button type="button" class="score-button score-button-muted" onclick="copy_url()">Share</button>
     <a id="url_text" class="share-link" href=""></a>
   </nav>
