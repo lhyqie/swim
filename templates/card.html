@@ -131,7 +131,7 @@ function gen_url() {
     if (th_list.length <= 1) {
         return;
     } 
-    var url = "/card?"
+    var url = window.location.origin + "/card?"
     url += "id="+encodeURIComponent({{swimmer_id | tojson | safe}});
     for (var i = 2; i < th_list.length; i++) {
         if (th_list[i].id.length > 0) {
