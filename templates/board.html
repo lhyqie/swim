@@ -7,131 +7,39 @@
 <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
-<style>
-body {
-    margin: 20px;
-}
-.switch {
-    position: relative;
-    display: inline-block;
-    width: 60px;
-    height: 34px;
-}
-
-.switch input { 
-    opacity: 0;
-    width: 0;
-    height: 0;
-}
-
-.slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #ccc;
-    -webkit-transition: .4s;
-    transition: .4s;
-}
-
-.slider:before {
-    position: absolute;
-    content: "";
-    height: 26px;
-    width: 26px;
-    left: 4px;
-    bottom: 4px;
-    background-color: white;
-    -webkit-transition: .4s;
-    transition: .4s;
-}
-
-input:checked + .slider {
-    background-color: #2196F3;
-}
-
-input:focus + .slider {
-    box-shadow: 0 0 1px #2196F3;
-}
-
-input:checked + .slider:before {
-    -webkit-transform: translateX(26px);
-    -ms-transform: translateX(26px);
-    transform: translateX(26px);
-}
-
-/* Rounded sliders */
-.tooltip{
-   font-family: monospace;
-}
-.tooltip-inner {
-    max-width: 300px !important;
-}
-.slider.round {
-    border-radius: 34px;
-}
-
-.slider.round:before {
-    border-radius: 50%;
-}
-
-/* table cell tooltip */
-.cell_with_comment{
-  position:relative;
-  text-decoration:underline;
-  text-decoration-style: dotted;
-}
-
-.cell_comment{
-  display:none;
-  position:absolute; 
-  z-index:100;
-  border:1px;
-  background-color:white;
-  border-style:solid;
-  border-width:1px;
-  border-color:rgba(103, 31, 31, 0.842);
-  padding:3px;
-  color:rgb(121, 190, 30); 
-  top:-60px; 
-  left:120px;
-  font-family: Arial;
-}
-
-.cell_with_comment:hover span.cell_comment{
-  color: white;
-  background: rgba(82, 119, 239, 0.95);
-  display:block;
-}
-</style>
 </head>
 
-<body>
-<h3 id="banner">Swimmers vs Time Standards</h3>
-<a href="/search" id="tosearch" class="btn btn-primary btn-sm">To Single Swimmer View</a> &nbsp;&nbsp;
-<a href="/swimmer" id="tocompare" class="btn btn-success btn-sm">To Multiple Swimmers View</a> &nbsp;&nbsp;
+<body class="score-page">
+<main class="score-shell">
+<header class="score-header">
+  <div>
+    <p class="score-kicker">SwimHub</p>
+    <h1 id="banner">Swimmers vs Time Standards</h1>
+  </div>
+  <nav class="score-actions">
+    <a href="/search" id="tosearch" class="score-button score-button-primary">Single Swimmer</a>
+    <a href="/swimmer" id="tocompare" class="score-button score-button-success">Multiple Swimmers</a>
+    <button type="button" class="score-button score-button-muted" onclick="copy_url()">Share</button>
+    <a id="url_text" class="share-link" href=""></a>
+  </nav>
+</header>
 
-<button type="button" class="btn btn-secondary btn-sm" onclick="copy_url()">Share</button>
-&nbsp;&nbsp;<a id="url_text" href=""></a>
-<br/><br/>
-<input type="text" id="event_filter" onkeyup="apply_filter()" placeholder="Search for Event Name.." size="30">
-<br/><br/>
-<!-- <label class="switch">
-    <input id="headroom" type="checkbox" onclick="toggle_headroom_column()"/>
-    <span class="slider round"></span>
-</label>&nbsp;&nbsp;Headroom -->
-
-<label class="form-check-label">By Season</label>&nbsp;&nbsp;&nbsp;&nbsp;
-<select id="season" class="form-select" onchange="redirect_with_season();">
-    <option value="scy">SCY</option>
-    <option value="lcm">LCM</option>
-</select>
-<br><br>
+<section class="score-toolbar" aria-label="Table controls">
+  <label class="control-field control-search">
+    <span>Event</span>
+    <input type="text" id="event_filter" onkeyup="apply_filter()" placeholder="Search event name">
+  </label>
+  <label class="control-field">
+    <span>Season</span>
+    <select id="season" class="form-select" onchange="redirect_with_season();">
+        <option value="scy">SCY</option>
+        <option value="lcm">LCM</option>
+    </select>
+  </label>
+</section>
 
 <div id="table-container" class="table-container">
-<table border="1" id="swimmers">
+<table id="swimmers">
     <thead>
         <tr>
             <th></th>
@@ -145,7 +53,7 @@ input:checked + .slider:before {
                 {% endif %}
             </th>
             {% elif colnames[i].endswith('@nt') %} 
-            <th id="{{nationaltime}}" style="text-align:center;"> 
+            <th id="{{nationaltime}}" class="national-header"> 
                 <a href="https://websitedevsa.blob.core.windows.net/sitefinity/docs/default-source/timesdocuments/time-standards/2025/2028-motivational-standards-age-group.pdf"> {{nationaltime}} 
                 </a> </th>
             {% else %}
@@ -186,6 +94,7 @@ input:checked + .slider:before {
     </tbody>
 </table>
 </div>
+</main>
 
 <script>
 function apply_filter() {
@@ -364,27 +273,6 @@ function headroom(timestr1, timestr2){
 $(function () {$('[data-toggle="tooltip"]').tooltip()})
 
 $(document).ready(function () {
-    $('#swimmers thead tr').each(function() {
-        $(this).find("th").each(function(cellIndex) {
-            var text = $(this).text().trim();
-            if (text.includes("FEMALE")) {
-                if (text.startsWith("JO") || text.startsWith("FW")) {
-                    $(this).css({"background-color":"#c40e0eee"});
-                } else {
-                    $(this).css({"background-color":"#d60e0ecc"});
-                }
-                
-            } else if (text.includes("MALE")) {
-                if (text.startsWith("JO") || text.startsWith("FW")) {
-                    $(this).css({"background-color":"#0608b3e2"});
-                } else {
-                    $(this).css({"background-color":"#0808b3b6"});
-                }
-                
-            }
-        });
-    });
-
     var season = {{season | tojson | safe}};
     if (season != "lcm" && season != "scy") {
         const d = new Date();

@@ -1,18 +1,32 @@
-{%if format == 'list' %}
+{% if format == 'list' %}
     {% for result in results %}
-    <option>
-    {{ result.slug }}, {{ result.name }} ({{ result.sex }} - {{ result.age }}) @ {{ result.team }} 
+    <option
+      value="{{ result.slug }}"
+      data-name="{{ result.name }}"
+      data-meta="{{ result.sex }} - {{ result.age }}"
+      data-team="{{ result.team }}">
+      {{ result.name }} - {{ result.age }} {{ result.sex }} - {{ result.team }}
     </option>
+    {% else %}
+    <option value="unset">No matches</option>
     {% endfor %}
 
 {% else %}
 
     {% for result in results %}
     <tr>
-        <td><a href="/card?id={{ result.slug }}"> {{ result.slug }}  ({{ result.name }}) <img width="15px" src="{{ url_for('static',filename='open-link.png') }}"/></a></td>
+        <td>
+          <a class="result-name" href="/card?id={{ result.slug }}">{{ result.name }}</a>
+          <div class="result-id">{{ result.slug }}</div>
+        </td>
         <td>{{ result.team }}</td>
         <td>{{ result.age }}</td>
         <td>{{ result.sex }}</td>
+        <td><a class="score-button score-button-muted score-button-compact" href="/card?id={{ result.slug }}">Open</a></td>
+    </tr>
+    {% else %}
+    <tr class="empty-row">
+        <td colspan="5">No swimmers found.</td>
     </tr>
     {% endfor %}
-{% endif  %}
+{% endif %}
