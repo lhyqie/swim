@@ -427,21 +427,6 @@ input:checked + .slider:before {
   display: block;
 }
 
-.container {
-  display: flex;
-  justify-content: center;
-}
-
-select.selectpicker {
-  width: 30em;
-}
-
-input#gender-male,
-input#gender-female {
-  width: 20px;
-  height: 20px;
-}
-
 .discovery-shell {
   max-width: 1120px;
 }
@@ -501,7 +486,7 @@ input#gender-female {
 }
 
 .results-wrap {
-  overflow: hidden;
+  overflow-x: auto;
   border: 1px solid var(--border);
   border-radius: 8px;
   background: var(--surface);
