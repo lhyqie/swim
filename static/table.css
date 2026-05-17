@@ -14,6 +14,8 @@
   --success-text: #166534;
   --event-bg: #fff6cc;
   --event-border: #f1d66b;
+  --event-col-width: 112px;
+  --card-sticky-col-width: 128px;
   --shadow: 0 18px 50px rgba(15, 23, 42, 0.12);
 }
 
@@ -369,7 +371,9 @@ input:checked + .slider:before {
   position: sticky;
   left: 0;
   z-index: 20;
-  min-width: 112px;
+  width: var(--event-col-width);
+  min-width: var(--event-col-width);
+  max-width: var(--event-col-width);
   border-right: 1px solid var(--event-border);
   background: var(--event-bg);
   color: #1f2937;
@@ -384,6 +388,35 @@ input:checked + .slider:before {
 
 #swimmers tbody tr:hover > td:first-child {
   background: #fff0a6;
+}
+
+body.score-card-page #swimmers tr > th:nth-child(2),
+body.score-card-page #swimmers tr > td:nth-child(2) {
+  position: sticky;
+  left: var(--event-col-width);
+  width: var(--card-sticky-col-width);
+  min-width: var(--card-sticky-col-width);
+  max-width: var(--card-sticky-col-width);
+  border-right: 1px solid var(--border-strong);
+  box-shadow: 6px 0 10px -10px rgba(15, 23, 42, 0.55);
+}
+
+body.score-card-page #swimmers tr > th:nth-child(2) {
+  z-index: 39;
+  background: var(--header-alt);
+}
+
+body.score-card-page #swimmers tr > td:nth-child(2) {
+  z-index: 19;
+  background: #ffffff;
+}
+
+body.score-card-page #swimmers tbody tr:nth-child(even) > td:nth-child(2) {
+  background: var(--surface-soft);
+}
+
+body.score-card-page #swimmers tbody tr:hover > td:nth-child(2) {
+  background: #eef6f6;
 }
 
 #swimmers td.qualified {
@@ -789,12 +822,21 @@ input:checked + .slider:before {
 
   #swimmers tr > th:first-child,
   #swimmers tr > td:first-child {
+    width: 86px;
     min-width: 86px;
-    max-width: 96px;
+    max-width: 86px;
     padding-right: 8px;
     padding-left: 8px;
     line-height: 1.15;
     white-space: normal;
+  }
+
+  body.score-card-page #swimmers tr > th:nth-child(2),
+  body.score-card-page #swimmers tr > td:nth-child(2) {
+    left: 86px;
+    width: 88px;
+    min-width: 88px;
+    max-width: 88px;
   }
 
   #swimmers td:not(:first-child) {
@@ -914,5 +956,96 @@ input:checked + .slider:before {
 
   #swimmers th a {
     max-width: 76px;
+  }
+}
+
+@media (max-width: 760px) {
+  body.score-data-page .score-shell {
+    padding-top: 14px;
+  }
+
+  body.score-data-page .score-header {
+    gap: 9px;
+    margin-bottom: 10px;
+  }
+
+  body.score-data-page #banner {
+    font-size: 21px;
+  }
+
+  body.score-data-page .score-actions {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+  }
+
+  body.score-data-page .score-button {
+    min-height: 34px;
+    padding: 0 8px;
+    border-radius: 7px;
+    font-size: 11px;
+    line-height: 1.1;
+  }
+
+  body.score-data-page .share-link {
+    font-size: 12px;
+  }
+
+  body.score-data-page .score-toolbar {
+    grid-template-columns: minmax(0, 1fr) 96px;
+    gap: 8px;
+    margin-bottom: 8px;
+    padding: 10px;
+  }
+
+  body.score-data-page .control-switch {
+    grid-column: 1 / -1;
+  }
+
+  body.score-data-page .control-field {
+    gap: 4px;
+    font-size: 11px;
+  }
+
+  body.score-data-page .control-field input,
+  body.score-data-page .control-field select {
+    height: 36px;
+    min-height: 36px;
+    min-width: 0;
+    padding-right: 28px;
+    font-size: 14px;
+  }
+
+  body.score-data-page .switch {
+    min-height: 32px;
+    font-size: 13px;
+  }
+
+  body.score-data-page .slider {
+    width: 38px;
+    height: 22px;
+    flex-basis: 38px;
+  }
+
+  body.score-data-page .slider:before {
+    width: 16px;
+    height: 16px;
+  }
+
+  body.score-data-page input:checked + .slider:before {
+    transform: translateX(16px);
+  }
+
+  body.score-data-page .table-container {
+    max-height: calc(100vh - 170px);
+  }
+}
+
+@media (max-width: 520px) {
+  body.score-data-page .score-actions {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  body.score-data-page .share-link {
+    grid-column: 1 / -1;
   }
 }
