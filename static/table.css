@@ -625,6 +625,29 @@ body.score-card-page #swimmers tbody tr:hover > td:nth-child(2) {
   text-align: center;
 }
 
+.pagination-row td {
+  background: #ffffff;
+}
+
+.pagination-controls {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.pagination-status {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.pagination-controls .score-button:disabled {
+  opacity: 0.45;
+  transform: none;
+  cursor: not-allowed;
+}
+
 .compare-grid {
   display: grid;
   grid-template-columns: minmax(280px, 0.9fr) minmax(360px, 1.1fr);
@@ -1023,6 +1046,14 @@ body.score-card-page #swimmers tbody tr:hover > td:nth-child(2) {
   .results-table .empty-row td {
     display: block;
     text-align: center;
+  }
+
+  .pagination-row {
+    box-shadow: none;
+  }
+
+  .pagination-controls {
+    justify-content: space-between;
   }
 
   .selected-table th:first-child,

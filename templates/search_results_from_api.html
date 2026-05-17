@@ -43,4 +43,31 @@
         <td colspan="5">No swimmers found.</td>
     </tr>
     {% endfor %}
+    {% if results or has_prev %}
+    <tr class="pagination-row">
+        <td colspan="5">
+          <div class="pagination-controls">
+            <button
+              type="button"
+              class="score-button score-button-muted score-button-compact"
+              {% if not has_prev %}disabled{% endif %}
+              {% if has_prev %}
+              hx-get="/search_results_from_api?q={{ q|urlencode }}&page={{ page - 1 }}"
+              hx-target="#results"
+              hx-swap="innerHTML"
+              {% endif %}>Previous</button>
+            <span class="pagination-status">Page {{ page }}</span>
+            <button
+              type="button"
+              class="score-button score-button-muted score-button-compact"
+              {% if not has_next %}disabled{% endif %}
+              {% if has_next %}
+              hx-get="/search_results_from_api?q={{ q|urlencode }}&page={{ page + 1 }}"
+              hx-target="#results"
+              hx-swap="innerHTML"
+              {% endif %}>Next</button>
+          </div>
+        </td>
+    </tr>
+    {% endif %}
 {% endif %}

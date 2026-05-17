@@ -145,9 +145,20 @@ def index():
 @app.route("/search_results_from_api")
 def search_api():
     q = request.args.get("q", "")
-    logging.debug(f'q={q}')
-    entries = data_provider.search_swimmers(q)
-    return render_template("search_results_from_api.html", results=entries)
+    page = max(request.args.get("page", 1, type=int), 1)
+    per_page = 20
+    skip = (page - 1) * per_page
+    logging.debug(f'q={q}, page={page}, skip={skip}')
+    entries = data_provider.search_swimmers(q, limit=per_page + 1, skip=skip)
+    has_next = len(entries) > per_page
+    return render_template(
+      "search_results_from_api.html",
+      results=entries[:per_page],
+      q=q,
+      page=page,
+      has_next=has_next,
+      has_prev=page > 1,
+    )
 
 
 @app.route('/swimmer/', methods=('GET', 'POST'))
