@@ -139,9 +139,9 @@ input:checked + .slider:before {
             {% if i == 0 %}
             <th>
                 {% if colnames[i].startswith('JO')%}
-                    <a href="https://www.pacswim.org/userfiles/cms/documents/809/agc-time-std.-scy-2024-2025-rev-8.27.24.pdf">{{colnames[i]}}</a>
+                    <a href="https://www.pacswim.org/userfiles/cms/documents/809/agc-time-std.-scy-2025-2026.pdf">{{colnames[i]}}</a>
                 {% elif colnames[i].startswith('FW') %}
-                    <a href="https://www.pacswim.org/userfiles/cms/documents/859/fw-time-std.---spring-2025-rev-8.27.24.pdf"> {{colnames[i]}} </a>
+                    <a href="https://www.pacswim.org/userfiles/cms/documents/858/fw-time-std.---summer-2026.pdf"> {{colnames[i]}} </a>
                 {% endif %}
             </th>
             {% elif colnames[i].endswith('@nt') %} 
@@ -150,7 +150,7 @@ input:checked + .slider:before {
                 </a> </th>
             {% else %}
             <th>
-                <a href="https://swimstandards.com/swimmer/{{colnames[i]}}">
+                <a href="{{colurls[i]}}">
                 {{ colnames[i] }}</a>
             </th>
             {% endif %}
@@ -216,7 +216,7 @@ function gen_url() {
     if (th_list.length <= 1) {
         return;
     } 
-    var url = "https://swimhub.org/board?"
+    var url = "/board?"
     url += "ts="+th_list[1].innerText;
     // check if nationaltime id is present
     for (var i = 0; i < th_list.length; i++) {
@@ -225,26 +225,9 @@ function gen_url() {
             break;
         }
     }
-    if (th_list.length > 2) {
-        url += "&id=";
-    }
-    // const buttonChecked = document.querySelector('#headroom').checked;
-    const buttonChecked = false;
-    var nationaltime = "{{nationaltime}}";
-    var step = (nationaltime.length > 0) ? 2 : 1;
-    for (i = 2; i < th_list.length; ) {
-      url += (th_list[i].innerText);
-      if (buttonChecked) {
-        if ( i < th_list.length - 1 - step) {
-          url += ",";
-        }
-        i += 1 + step;
-      } else {
-        if ( i < th_list.length  - step) {
-          url += ",";
-        }
-        i += step;
-      }
+    const swimmerIds = {{swimmer_ids | tojson | safe}};
+    if (swimmerIds.length > 0) {
+        url += "&id=" + swimmerIds.map(encodeURIComponent).join(",");
     }
     url += "&season="+document.getElementById("season").value;
     // console.log(url);

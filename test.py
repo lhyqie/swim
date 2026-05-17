@@ -1,5 +1,6 @@
 # -------------------- Test Crawler --------------------------
-from utils import SwimStandardsCrawler, to_fastest
+from data.swimmer_data_provider import SwimStandardsCrawler
+from utils import to_fastest
 crawler = SwimStandardsCrawler()
 
 # for event in crawler.crawl_fastest_time('https://swimstandards.com/swimmer/abby-chan'):
@@ -12,10 +13,10 @@ print('----------------------------------------------------')
 for event in to_fastest(all_events):
   print(event)
 
-# -------------------- Test EventFetcher --------------------------
-# from utils import EventFetcher
-# event_fetcher = EventFetcher()
-# events, gender, age = event_fetcher.swimmer_fastest_time('abby-chan')
+# -------------------- Test DataProvider --------------------------
+# from data.swimmer_data_provider import SwimStandardsDataProvider
+# data_provider = SwimStandardsDataProvider()
+# events, gender, age, swimmer_display_name = data_provider.swimmer_fastest_time('abby-chan')
 # print(gender, age)
 # for event in events:
 #   print(event)

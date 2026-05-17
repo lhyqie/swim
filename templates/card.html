@@ -151,7 +151,7 @@ input:checked + .slider:before {
             {% for i in range(colnames | length): %}
             {% if i == 0 %}
             <th>
-              <a href="https://swimstandards.com/swimmer/{{colnames[i]}}">
+              <a href="{{swimmer_profile_url}}">
               {{ colnames[i] }}</a>
             </th>
             {% elif i == 1 %} 
@@ -162,9 +162,9 @@ input:checked + .slider:before {
             {% else %}
             <th>
               {% if colnames[i].startswith('JO')%}
-                  <a href="https://www.pacswim.org/userfiles/cms/documents/809/agc-time-std.-scy-2024-2025-rev-8.27.24.pdf">{{colnames[i]}}</a>
+                  <a href="https://www.pacswim.org/userfiles/cms/documents/809/agc-time-std.-scy-2025-2026.pdf">{{colnames[i]}}</a>
               {% elif colnames[i].startswith('FW') %}
-                  <a href="https://www.pacswim.org/userfiles/cms/documents/859/fw-time-std.---spring-2025-rev-8.27.24.pdf"> {{colnames[i]}} </a>
+                  <a href="https://www.pacswim.org/userfiles/cms/documents/858/fw-time-std.---summer-2026.pdf"> {{colnames[i]}} </a>
               {% endif %}
             </th>
             {% endif %}
@@ -229,8 +229,8 @@ function gen_url() {
     if (th_list.length <= 1) {
         return;
     } 
-    var url = "https://swimhub.org/card?"
-    url += "id="+th_list[1].innerText;
+    var url = "/card?"
+    url += "id="+encodeURIComponent({{swimmer_id | tojson | safe}});
     for (var i = 2; i < th_list.length; i++) {
         if (th_list[i].id.length > 0) {
             url += "&nt="+th_list[i].id;

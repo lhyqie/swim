@@ -1,39 +1,6 @@
-import json
-import requests
-from bs4 import BeautifulSoup
+from data.swimmer_data_provider import Event, FastestEvent
 from times import national_timemap,times_map,times_name_pair,time_name_fits_age_gender
 from typing import List
-
-
-class Event:
-  def __init__(self, entry):
-    self.swimmer_name = entry['name']
-    self.sex = entry['sex']
-    self.event_name = entry['event']
-    self.type = entry['type']
-    self.date = entry['date']
-    self.age = entry['age']
-    self.time = entry['time']
-    self.standard = entry['standard']
-    self.power_points = entry['powerPoints']
-    self.swim_meet = entry['swimMeet']
-
-  def __str__(self):
-    return f'{self.date} | {self.swimmer_name} ({self.age}) | {self.event_name:8s} {self.type} | {self.time:7s} ({self.standard:2s}) | {self.swim_meet}'
-
-
-class FastestEvent:
-  def __init__(self, event_name='', time=''):
-    self.event_name = event_name
-    self.time = time
-    # self.age = ''
-    # self.swim_meet = ''
-    # self.date = ''
-
-  def __str__(self):
-    # return f'{self.event_name:12s} ({self.age}) | {self.time:7s} | {self.date} | {self.swim_meet}'
-    # return f'{self.event_name:12s} ({self.age}) | {self.time:7s}'
-    return f'{self.event_name:12s} | {self.time:7s}'
 
 
 def national_time_standard(event:str, timestr:str, national_timemap) -> str:
@@ -160,133 +127,36 @@ def to_fastest(events: List[Event]) -> List[FastestEvent]:
   fastest_events.sort(key=cmp_to_key(compare_event_name))
   return fastest_events
 
-class SwimStandardsCrawler:
-  def __init__(self):
-    pass
-
-  # for example swimmer url: https://swimstandards.com/swimmer/abby-chan
-  def crawl_all_events(self, url):
-    try:
-      from curl_cffi import requests as cffi_requests
-      response = cffi_requests.get(url, impersonate='chrome124')
-    except ImportError:
-      headers = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
-        'Accept-Language': 'en-US,en;q=0.9',
-        'Accept-Encoding': 'gzip, deflate, br',
-        'Referer': 'https://swimstandards.com/',
-        'Connection': 'keep-alive',
-        'Upgrade-Insecure-Requests': '1',
-        'Sec-Fetch-Dest': 'document',
-        'Sec-Fetch-Mode': 'navigate',
-        'Sec-Fetch-Site': 'same-origin',
-        'Sec-Fetch-User': '?1',
-      }
-      response = requests.get(url, headers=headers)
-    if response.status_code != 200:
-      raise RuntimeError(f'Failed to fetch {url}: HTTP {response.status_code}')
-    soup = BeautifulSoup(response.content, 'html.parser')
-    script_tag = soup.find("script", {"id": "__NEXT_DATA__"})
-    if script_tag is None:
-      raise RuntimeError(f'Could not find __NEXT_DATA__ script tag in {url}')
-    jobj = json.loads(script_tag.string)
-    swimmer_data = jobj['props']['pageProps']['swimmer']
-    gender = swimmer_data['sex']
-    age = swimmer_data['age']
-    events = []
-    for elem in swimmer_data['records']['data']:
-      event = Event(elem)
-      events.append(event)
-    return events, gender, age
-
-  # for example swimmer url: https://swimstandards.com/swimmer/abby-chan
-  def crawl_fastest_time(self, url):
-    response = requests.get(url)
-    soup = BeautifulSoup(response.content, 'html.parser')
-
-    tabs = soup.select('div[class=swimmer-tabs]')
-    subtabs = []
-    for tab in tabs:
-      subtabs.extend(tab.select('div[class~=active]'))
-
-    data = []
-    for tab in subtabs:
-      rows = tab.table.tbody.find_all('tr') if tab.table else []
-      for row in rows:
-        tds = row.find_all('td')
-        data_row = []
-        for ele in tds:
-          cell = ele.get_text('|').strip()
-          data_row.append(cell)
-        data.append(data_row)
-      break
-
-    events = []
-    column_names = ['Event', 'Time', 'Standard', 'Points', 'Age', 'Meet', 'Meet Date']
-    for row in data:
-      event = FastestEvent()
-      for i, cell in enumerate(row):
-        if column_names[i] in ['Event', 'Time', 'Age', 'Meet', 'Meet Date']:
-          cell = (cell.rstrip('|').lstrip(column_names[i]+'|'))
-          if column_names[i] == 'Event':
-            event.event_name = cell
-          elif column_names[i] == 'Time':
-            event.time = cell
-          elif column_names[i] == 'Age':
-            event.age = cell
-          elif column_names[i] == 'Meet':
-            event.swim_meet = cell
-          elif column_names[i] == 'Meet Date':
-            event.date = cell
-      events.append(event)
-    return events
-
-  # for example team url:
-  # https://swimstandards.com/rankings/50fr-scy-9-10-male-pc_alto?target=12&u_season=2324&u_season_start=2023&u_season_end=2024
-  def crawl_swimmers(self, team_url):
-    response = requests.get(team_url)
-    soup = BeautifulSoup(response.content, 'html.parser')
-    table = soup.select('table[id=all-results-table]')
-    subtabs = []
-    result = table[0].tbody.select('a')
-    if len(result) > 0:
-      for a in result:
-        swimmer = a['href'].split('/')[-1]
-        yield swimmer
-
-class EventFetcher:
-  def __init__(self):
-    self.crawler = SwimStandardsCrawler()
-
-  def swimmer_fastest_time(self, swimmer_id):
-    try:
-      events, gender, age = self.crawler.crawl_all_events('https://swimstandards.com/swimmer/' + swimmer_id)
-      events = to_fastest(events)
-    except (KeyError, RuntimeError):
-      return [], None, None
-    return events, gender, age
-
 # A score board is to represent one timestand and optional national time and muliple swimmers.
 class ScoreBoard:
-  def __init__(self, time_standard, national_time) -> None:
+  def __init__(self, time_standard, national_time, data_provider=None) -> None:
     self.board = []
     self.swimmers = []
+    self.swimmer_ids = []
+    self.colids = []
     self.time_standard = time_standard
     self.national_time = national_time
-    self.event_fetcher = EventFetcher()
+    self.data_provider = data_provider
 
   def add_time_standards(self):
     self.board.append(times_map[self.time_standard])
     self.swimmers.append(self.time_standard)
+    self.swimmer_ids.append(self.time_standard)
 
   def add_swimmer(self, swimmer_id):
     column = {}
-    events, gender, age = self.event_fetcher.swimmer_fastest_time(swimmer_id)
+    events, gender, age, swimmer_display_name = self.data_provider.swimmer_fastest_time(swimmer_id)
     for event in events:
       column[event.event_name] = event.time
     self.board.append(column)
-    self.swimmers.append(swimmer_id)
+    self.swimmers.append(self._swimmer_label(swimmer_id, swimmer_display_name))
+    self.swimmer_ids.append(swimmer_id)
+
+  def _swimmer_label(self, swimmer_id, swimmer_display_name):
+    label = swimmer_display_name or swimmer_id
+    if label in self.swimmers:
+      return f"{label} ({swimmer_id})"
+    return label
 
   def gen_report(self, format='dataframe'):
     if format == 'dataframe':
@@ -294,10 +164,12 @@ class ScoreBoard:
       import pandas as pd
       df = pd.DataFrame.from_dict(self.board).T
       df.columns = self.swimmers
+      self.colids = list(self.swimmer_ids)
       return df.replace(np.nan, '')
     elif format == 'records':
       rownames = [k for k, _ in self.board[0].items()]
       colnames = self.swimmers
+      self.colids = list(self.swimmer_ids)
       records = []
       for rowname in rownames:
         time_map = {}  # for each row (event), record the fastest time per swimmer
@@ -308,9 +180,13 @@ class ScoreBoard:
     elif format == 'records+nationaltime':
       rownames = [k for k, _ in self.board[0].items()]
       colnames = []
+      self.colids = []
       for i, swimmer in enumerate(self.swimmers):
         colnames.append(swimmer)
-        if i > 0: colnames.append(swimmer+'@nt')
+        self.colids.append(self.swimmer_ids[i])
+        if i > 0:
+          colnames.append(swimmer+'@nt')
+          self.colids.append('')
       records = []
       for rowname in rownames:
         time_map = {}  # for each row (event), record the fastest time per swimmer
@@ -320,13 +196,6 @@ class ScoreBoard:
             event=rowname, timestr=time_map[swimmer], national_timemap=national_timemap[self.national_time])
         records.append(time_map)
       return (records, rownames, colnames)
-    elif format == 'json':
-      from json2html import convert
-      jobj = {}
-      for swimmer_id, events in zip(self.swimmers, self.board):
-        jobj[swimmer_id] = events
-      # return json.dumps(jobj)
-      return convert(json=jobj)
     elif format == 'dict':
       jobj = {}
       for swimmer_id, events in zip(self.swimmers, self.board):
@@ -338,12 +207,12 @@ class ScoreBoard:
   
 # A score card is to represent one swimmer, his/her national time and all timestandards.
 class ScoreCard:
-  def __init__(self, swimmer, nationaltime) -> None:
+  def __init__(self, swimmer, nationaltime, data_provider=None) -> None:
     self.board = []
     self.swimmer = swimmer
     self.swimmers = []
     self.national_time = nationaltime
-    self.event_fetcher = EventFetcher()
+    self.data_provider = data_provider
     self.gender = 'Male'
     self.age = 10
     # the first column is swimmmer, the next columns are time standards.
@@ -352,9 +221,9 @@ class ScoreCard:
 
   def _add_swimmer_to_board(self):
     if not self.swimmer: return
-    self.swimmers.append(self.swimmer)
     column = {}
-    events, gender, age = self.event_fetcher.swimmer_fastest_time(self.swimmer)
+    events, gender, age, swimmer_display_name = self.data_provider.swimmer_fastest_time(self.swimmer)
+    self.swimmers.append(swimmer_display_name or self.swimmer)
     if gender is not None:
       self.gender = gender
     if age is not None:

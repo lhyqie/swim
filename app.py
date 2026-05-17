@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, session, redirect, url_for, a
 from flask_wtf import FlaskForm
 from utils import ScoreBoard, ScoreCard
 from wtforms import SelectField, TextAreaField
-from data.swimmer_data_provider import AjzxHubDataProvider
+from data.swimmer_data_provider import AjzxHubDataProvider, SwimStandardsDataProvider
 from times import times_name_pair, national_times_name_pair, national_timemap
 
 
@@ -12,7 +12,13 @@ import os
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY') or 'you-will-never-guess'  # this need to be top-level, otherwise server will throw error: RuntimeError: A secret key is required to use CSRF.
+
 data_provider = AjzxHubDataProvider()
+# data_provider = SwimStandardsDataProvider()
+
+
+def swimmer_profile_url(swimmer_id):
+  return data_provider.swimmer_profile_url(swimmer_id) if swimmer_id else ''
 
 
 @app.context_processor
@@ -53,7 +59,7 @@ def board(format='records+nationaltime'):
   logging.debug(f'nationaltime={nationaltime}')
   logging.debug(f'format={format}')
 
-  sb = ScoreBoard(time_standard=timestandard, national_time=nationaltime)
+  sb = ScoreBoard(time_standard=timestandard, national_time=nationaltime, data_provider=data_provider)
   sb.add_time_standards()
   swimmer_param = request.args.get('id') or session.get('swimmers')
   if swimmer_param:
@@ -69,6 +75,10 @@ def board(format='records+nationaltime'):
   else:
     raise Exception(f'format {format} is not supported')
   logging.debug(f'records size={len(records)}, rownames size={len(rownames)}, colnames size={len(colnames)}')
+  colurls = [
+    swimmer_profile_url(colid) if i > 0 and colid else ''
+    for i, colid in enumerate(sb.colids)
+  ]
 
   if request.method == 'POST':
     session['ts'] = request.form.get('timestandard','JO-10-MALE')
@@ -88,7 +98,8 @@ def board(format='records+nationaltime'):
        return response
 
     return render_template('board.html', season=season, nationaltime=nationaltime, national_timemap=national_timemap,
-                           records=records, rownames=rownames, colnames=colnames)
+                           records=records, rownames=rownames, colnames=colnames,
+                           colids=sb.colids, colurls=colurls, swimmer_ids=sb.swimmer_ids[1:])
 
 
 @app.route('/card', methods=('GET', 'POST'))
@@ -104,17 +115,15 @@ def card():
     return redirect(url_for('card', **request.args))
   
   swimmer = request.args.get('id') or session.get('swimmer')
-  if not swimmer:
-    return redirect(url_for('form2', **request.args))
-
   nationaltime = request.args.get('nt') or session.get('nt') or ''
   season = request.args.get('season') or session.get('season') or ''
   logging.debug(f'swimmer={swimmer}  nationaltime={nationaltime}  season={season}')
-  sc = ScoreCard(swimmer, nationaltime)
+  sc = ScoreCard(swimmer, nationaltime, data_provider=data_provider)
   records, rownames, colnames = sc.gen_report()
   logging.debug(f'records size={len(records)}, rownames size={len(rownames)}, colnames size={len(colnames)}')  
   return render_template('card.html', season=season, nationaltime=sc.national_time, national_timemap=national_timemap,
-                         records=records, rownames=rownames, colnames=colnames)
+                         records=records, rownames=rownames, colnames=colnames, swimmer_id=swimmer,
+                         swimmer_profile_url=swimmer_profile_url(swimmer))
 
 
 class ScoreBoardForm(FlaskForm):

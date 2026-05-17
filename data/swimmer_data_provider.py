@@ -1,10 +1,12 @@
 from abc import ABC, abstractmethod
 import base64
 from dataclasses import dataclass
+import json
 import re
 import time
 from urllib.parse import quote
 
+from bs4 import BeautifulSoup
 import requests
 
 
@@ -17,9 +19,133 @@ class SwimmerProfile:
   team: str
 
 
+class Event:
+  def __init__(self, entry):
+    self.swimmer_name = entry['name']
+    self.sex = entry['sex']
+    self.event_name = entry['event']
+    self.type = entry['type']
+    self.date = entry['date']
+    self.age = entry['age']
+    self.time = entry['time']
+    self.standard = entry['standard']
+    self.power_points = entry['powerPoints']
+    self.swim_meet = entry['swimMeet']
+
+  def __str__(self):
+    return f'{self.date} | {self.swimmer_name} ({self.age}) | {self.event_name:8s} {self.type} | {self.time:7s} ({self.standard:2s}) | {self.swim_meet}'
+
+
+class FastestEvent:
+  def __init__(self, event_name='', time=''):
+    self.event_name = event_name
+    self.time = time
+    # self.age = ''
+    # self.swim_meet = ''
+    # self.date = ''
+
+  def __str__(self):
+    # return f'{self.event_name:12s} ({self.age}) | {self.time:7s} | {self.date} | {self.swim_meet}'
+    # return f'{self.event_name:12s} ({self.age}) | {self.time:7s}'
+    return f'{self.event_name:12s} | {self.time:7s}'
+
+
+class SwimStandardsCrawler:
+  def __init__(self):
+    pass
+
+  # for example swimmer url: https://swimstandards.com/swimmer/abby-chan
+  def crawl_all_events(self, url):
+    try:
+      from curl_cffi import requests as cffi_requests
+      response = cffi_requests.get(url, impersonate='chrome124')
+    except ImportError:
+      headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
+        'Accept-Language': 'en-US,en;q=0.9',
+        'Accept-Encoding': 'gzip, deflate, br',
+        'Referer': 'https://swimstandards.com/',
+        'Connection': 'keep-alive',
+        'Upgrade-Insecure-Requests': '1',
+        'Sec-Fetch-Dest': 'document',
+        'Sec-Fetch-Mode': 'navigate',
+        'Sec-Fetch-Site': 'same-origin',
+        'Sec-Fetch-User': '?1',
+      }
+      response = requests.get(url, headers=headers)
+    if response.status_code != 200:
+      raise RuntimeError(f'Failed to fetch {url}: HTTP {response.status_code}')
+    soup = BeautifulSoup(response.content, 'html.parser')
+    script_tag = soup.find("script", {"id": "__NEXT_DATA__"})
+    if script_tag is None:
+      raise RuntimeError(f'Could not find __NEXT_DATA__ script tag in {url}')
+    jobj = json.loads(script_tag.string)
+    swimmer_data = jobj['props']['pageProps']['swimmer']
+    gender = swimmer_data['sex']
+    age = swimmer_data['age']
+    events = []
+    for elem in swimmer_data['records']['data']:
+      event = Event(elem)
+      events.append(event)
+    return events, gender, age
+
+  # for example swimmer url: https://swimstandards.com/swimmer/abby-chan
+  def crawl_fastest_time(self, url):
+    response = requests.get(url)
+    soup = BeautifulSoup(response.content, 'html.parser')
+
+    tabs = soup.select('div[class=swimmer-tabs]')
+    subtabs = []
+    for tab in tabs:
+      subtabs.extend(tab.select('div[class~=active]'))
+
+    data = []
+    for tab in subtabs:
+      rows = tab.table.tbody.find_all('tr') if tab.table else []
+      for row in rows:
+        tds = row.find_all('td')
+        data_row = []
+        for ele in tds:
+          cell = ele.get_text('|').strip()
+          data_row.append(cell)
+        data.append(data_row)
+      break
+
+    events = []
+    column_names = ['Event', 'Time', 'Standard', 'Points', 'Age', 'Meet', 'Meet Date']
+    for row in data:
+      event = FastestEvent()
+      for i, cell in enumerate(row):
+        if column_names[i] in ['Event', 'Time', 'Age', 'Meet', 'Meet Date']:
+          cell = (cell.rstrip('|').lstrip(column_names[i]+'|'))
+          if column_names[i] == 'Event':
+            event.event_name = cell
+          elif column_names[i] == 'Time':
+            event.time = cell
+          elif column_names[i] == 'Age':
+            event.age = cell
+          elif column_names[i] == 'Meet':
+            event.swim_meet = cell
+          elif column_names[i] == 'Meet Date':
+            event.date = cell
+      events.append(event)
+    return events
+
+
 class SwimmerSearchDataProvider(ABC):
   @abstractmethod
   def search_swimmers(self, query, limit=20, skip=0) -> list[SwimmerProfile]:
+    pass
+
+
+  @abstractmethod
+  def swimmer_fastest_time(self, swimmer_id) -> tuple[list[FastestEvent], str | None, int | None, str | None]:
+    """Returns a tuple of (events, gender, age, swimmer_display_name) for the given swimmer_id."""
+    pass
+
+  @abstractmethod
+  def swimmer_profile_url(self, swimmer_id) -> str:
     pass
 
 
@@ -93,8 +219,94 @@ class AjzxHubDataProvider(SwimmerSearchDataProvider):
       "dimensions": {
         "pkey": "UsasSwimTime.PersonKey",
         "gender": "UsasSwimTime.EventCompetitionCategoryKey",
+        "event": "UsasSwimTime.SwimEventKey",
+        "time": "UsasSwimTime.SwimTimeFormatted",
+        "best": "UsasSwimTime.LifeTimeBest",
+        "age": "UsasSwimTime.AgeAtMeetKey",
       },
     },
+  }
+  EVENT_KEY_NAMES = {
+    1: "50 FR SCY",
+    2: "100 FR SCY",
+    3: "200 FR SCY",
+    4: "500 FR SCY",
+    5: "1000 FR SCY",
+    6: "1650 FR SCY",
+    11: "50 BK SCY",
+    12: "100 BK SCY",
+    13: "200 BK SCY",
+    14: "50 BR SCY",
+    15: "100 BR SCY",
+    16: "200 BR SCY",
+    17: "50 FL SCY",
+    18: "100 FL SCY",
+    19: "200 FL SCY",
+    20: "100 IM SCY",
+    21: "200 IM SCY",
+    22: "400 IM SCY",
+    28: "50 FR SCM",
+    29: "100 FR SCM",
+    30: "200 FR SCM",
+    31: "400 FR SCM",
+    32: "800 FR SCM",
+    33: "1500 FR SCM",
+    38: "50 BK SCM",
+    39: "100 BK SCM",
+    40: "200 BK SCM",
+    41: "50 BR SCM",
+    42: "100 BR SCM",
+    43: "200 BR SCM",
+    44: "50 FL SCM",
+    45: "100 FL SCM",
+    46: "200 FL SCM",
+    47: "100 IM SCM",
+    48: "200 IM SCM",
+    49: "400 IM SCM",
+    55: "50 FR LCM",
+    56: "100 FR LCM",
+    57: "200 FR LCM",
+    58: "400 FR LCM",
+    59: "800 FR LCM",
+    60: "1500 FR LCM",
+    65: "50 BK LCM",
+    66: "100 BK LCM",
+    67: "200 BK LCM",
+    68: "50 BR LCM",
+    69: "100 BR LCM",
+    70: "200 BR LCM",
+    71: "50 FL LCM",
+    72: "100 FL LCM",
+    73: "200 FL LCM",
+    74: "200 IM LCM",
+    75: "400 IM LCM",
+    81: "25 FR SCY",
+    82: "25 BK SCY",
+    83: "25 BR SCY",
+    84: "25 FL SCY",
+    85: "25 FR SCM",
+    86: "25 BK SCM",
+    87: "25 BR SCM",
+    88: "25 FL SCM",
+  }
+  STROKE_NAMES = {
+    "FR": "Free",
+    "BK": "Back",
+    "BR": "Breast",
+    "FL": "Fly",
+    "IM": "IM",
+  }
+  COURSE_NAMES = {
+    "SCY": "Y",
+    "SCM": "M",
+    "LCM": "M",
+  }
+  STROKE_ORDER = {
+    "Free": 0,
+    "Back": 1,
+    "Breast": 2,
+    "Fly": 3,
+    "IM": 4,
   }
 
   def __init__(self, session=None):
@@ -123,6 +335,73 @@ class AjzxHubDataProvider(SwimmerSearchDataProvider):
       _swimmer_profile_from_entry(entry)
       for entry in entries[skip:skip + limit]
     ]
+
+  def swimmer_fastest_time(self, swimmer_id) -> tuple[list[FastestEvent], str | None, int | None, str | None]:
+    swimmer_id = str(swimmer_id or "").strip()
+    if not swimmer_id:
+      return [], None, None, None
+    if not swimmer_id.isdigit():
+      return SwimStandardsDataProvider().swimmer_fastest_time(swimmer_id)
+
+    try:
+      entries = self._query_datasource(
+        "event",
+        5000,
+        ["pkey", "event", "time", "best", "age", "gender"],
+        {"pkey": {"members": [int(swimmer_id)]}},
+      )
+    except (KeyError, RuntimeError, ValueError, requests.RequestException):
+      return [], None, None, None
+
+    gender = None
+    age, swimmer_display_name = self._swimmer_profile(swimmer_id)
+    fastest_by_event = {}
+    for entry in entries:
+      if gender is None:
+        gender = self._sex_from_event_gender(entry.get("gender")) or None
+
+      entry_age = _normalize_age(entry.get("age"))
+      if age is None and entry_age:
+        age = entry_age
+
+      event_name = self._event_name_from_key(entry.get("event"))
+      time_text = str(entry.get("time") or "").strip()
+      time_value = self._time_sort_value(time_text)
+      if not event_name or time_value is None:
+        continue
+
+      current = fastest_by_event.get(event_name)
+      if current is None or time_value < current[0]:
+        fastest_by_event[event_name] = (time_value, time_text)
+
+    events = [
+      FastestEvent(event_name, time_text)
+      for event_name, (_, time_text) in fastest_by_event.items()
+    ]
+    events.sort(key=lambda event: self._event_sort_key(event.event_name))
+    return events, gender, age, swimmer_display_name or swimmer_id
+
+  def swimmer_profile_url(self, swimmer_id) -> str:
+    return f"{self.BASE_URL}/#swimmer/{quote(str(swimmer_id or ''), safe='')}"
+
+  def _swimmer_profile(self, swimmer_id):
+    try:
+      entries = self._query_datasource(
+        "swimmer",
+        1,
+        ["pkey", "name", "age"],
+        {"pkey": {"members": [int(swimmer_id)]}},
+      )
+    except (KeyError, RuntimeError, ValueError, requests.RequestException):
+      return None, None
+
+    if not entries:
+      return None, None
+    entry = entries[0]
+    return (
+      _normalize_age(entry.get("age")) or None,
+      str(entry.get("name") or "").strip() or None,
+    )
 
   def _normalize_query(self, query):
     include_adults = query.endswith("~19O")
@@ -218,6 +497,42 @@ class AjzxHubDataProvider(SwimmerSearchDataProvider):
     if gender == 2:
       return "Male"
     return ""
+
+  def _event_name_from_key(self, event_key):
+    try:
+      event_label = self.EVENT_KEY_NAMES[int(event_key)]
+    except (KeyError, TypeError, ValueError):
+      return ""
+
+    distance, stroke, course = event_label.split()
+    stroke_name = self.STROKE_NAMES.get(stroke)
+    course_name = self.COURSE_NAMES.get(course)
+    if not stroke_name or not course_name:
+      return ""
+    return f"{distance} {course_name} {stroke_name}"
+
+  def _event_sort_key(self, event_name):
+    try:
+      distance, course, stroke = event_name.split()
+      return (
+        0 if course == "Y" else 1,
+        self.STROKE_ORDER.get(stroke, 99),
+        int(distance),
+      )
+    except ValueError:
+      return (99, 99, 0)
+
+  def _time_sort_value(self, time_text):
+    if not time_text or time_text == "00.00":
+      return None
+    try:
+      parts = time_text.split(":")
+      seconds = float(parts[-1])
+      for part in parts[:-1]:
+        seconds += int(part) * 60
+      return seconds
+    except ValueError:
+      return None
 
   def _query_datasource(self, datasource_name, count, fields, filters, query=""):
     datasource = self.DATASOURCES[datasource_name]
@@ -457,3 +772,19 @@ class SwimStandardsDataProvider(SwimmerSearchDataProvider):
       _swimmer_profile_from_entry(entry)
       for entry in _swimmer_entries_from_payload(response.json())
     ]
+
+  def swimmer_fastest_time(self, swimmer_id) -> tuple[list[FastestEvent], str | None, int | None, str | None]:
+    try:
+      from utils import to_fastest
+
+      crawler = SwimStandardsCrawler()
+      events, gender, age = crawler.crawl_all_events(
+        "https://swimstandards.com/swimmer/" + str(swimmer_id)
+      )
+      swimmer_display_name = events[0].swimmer_name if events else swimmer_id
+      return to_fastest(events), gender, age, swimmer_display_name
+    except (KeyError, RuntimeError, requests.RequestException):
+      return [], None, None, None
+
+  def swimmer_profile_url(self, swimmer_id) -> str:
+    return f"https://swimstandards.com/swimmer/{quote(str(swimmer_id or ''), safe='')}"
